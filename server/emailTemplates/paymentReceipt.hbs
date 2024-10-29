@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #000;
+            margin: 0;
+            padding: 20px;
+        }
+        .receipt-container {
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in;
+            border: 1px solid #ddd;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-height: 60px;
+            margin-bottom: 15px;
+        }
+        .company-info {
+            text-align: right;
+        }
+        .receipt-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .payment-details {
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-weight: bold;
+            border-top: 1px solid #000;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <img src="{{logoUrl}}" alt="Summit Ridge Logo" class="logo"/>
+                <h1>Payment Receipt</h1>
+            </div>
+            <div class="company-info">
+                <p>Summit Ridge HOA</p>
+                <p>123 Summit Ridge Drive</p>
+                <p>Summit City, ST 12345</p>
+                <p>(555) 123-4567</p>
+            </div>
+        </div>
+
+        <!-- Receipt Info -->
+        <div class="receipt-info">
+            <div>
+                <p class="bold">Receipt Number:</p>
+                <p>#{{padStart paymentId 6 '0'}}</p>
+            </div>
+            <div>
+                <p class="bold">Date:</p>
+                <p>{{formatDate date}}</p>
+            </div>
+            <div>
+                <p class="bold">Account Number:</p>
+                <p>{{accountId}}</p>
+            </div>
+            <div>
+                <p class="bold">Payment Method:</p>
+                <p>{{cardType}} ending in {{cardLastFour}}</p>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="payment-details">
+            <div class="detail-row">
+                <span class="bold">Description</span>
+                <span class="bold">Amount</span>
+            </div>
+            <div class="detail-row">
+                <span>{{description}}</span>
+                <span>{{formatCurrency amount}}</span>
+            </div>
+            <div class="total-row">
+                <span>Total Amount Paid</span>
+                <span>{{formatCurrency amount}}</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for your payment. This receipt serves as confirmation of your payment to Summit Ridge HOA.</p>
+            <p>Please retain this receipt for your records.</p>
+        </div>
+    </div>
+</body>
+</html>

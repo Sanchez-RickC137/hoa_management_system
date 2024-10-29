@@ -1,0 +1,44 @@
+<h2 style="color: #2C5234; margin-bottom: 20px;">New {{type}} from Summit Ridge HOA</h2>
+
+<p>Hello {{recipientName}},</p>
+
+<div style="background-color: #f5f6f7; padding: 20px; border-radius: 5px; margin: 20px 0;">
+    <h3 style="color: #2C5234; margin-top: 0;">{{title}}</h3>
+    <p style="font-size: 16px;">{{description}}</p>
+    
+    {{#if eventDate}}
+    <p style="margin-top: 15px;">
+        <strong>Event Date:</strong> {{eventDate}}
+    </p>
+    {{/if}}
+    
+    {{#if eventLocation}}
+    <p>
+        <strong>Location:</strong> {{eventLocation}}
+    </p>
+    {{/if}}
+
+    {{#if hasAttachment}}
+    <p style="margin-top: 15px;">
+        <strong>Note:</strong> This {{type}} includes an attachment. Please visit the website to view it.
+    </p>
+    {{/if}}
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{itemUrl}}" class="button" style="font-size: 16px;">
+        View {{type}}
+    </a>
+</div>
+
+<p style="color: #666; font-size: 14px; margin-top: 30px;">
+    If you're having trouble with the button above, you can copy and paste this link into your browser:<br>
+    <a href="{{itemUrl}}" style="color: #2C5234;">{{itemUrl}}</a>
+</p>
+
+<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+<p style="font-size: 12px; color: #666;">
+    You received this email because you opted in to news and document notifications from Summit Ridge HOA. 
+    You can update your preferences at any time by visiting your <a href="{{preferencesUrl}}" style="color: #2C5234;">account settings</a>.
+</p>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Message from Summit Ridge HOA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .message-content {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4A90E2;
+      color: white !important;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 15px;
+    }
+    .footer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>New Message from {{senderName}}</h2>
+    <p>You have received a new message on the Summit Ridge HOA portal:</p>
+    
+    <div class="message-content">
+      {{message}}
+    </div>
+
+    <a href="{{messageUrl}}" class="button">View Message</a>
+
+    <div class="footer">
+      <p>This email was sent by Summit Ridge HOA.</p>
+      <p>
+        To manage your email notification preferences, 
+        <a href="{{preferencesUrl}}">click here</a>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

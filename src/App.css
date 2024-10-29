@@ -36,3 +36,80 @@
     transform: rotate(360deg);
   }
 }
+
+/* Add to App.css */
+.responsive-calendar .rbc-calendar {
+  min-height: 400px;
+}
+
+@media (max-width: 767px) {
+  .responsive-calendar .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px;
+  }
+
+  .responsive-calendar .rbc-toolbar-label {
+    margin: 8px 0;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .responsive-calendar .rbc-btn-group {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .responsive-calendar .rbc-btn-group button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .responsive-calendar .rbc-header {
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .responsive-calendar .rbc-event {
+    padding: 2px 4px;
+    font-size: 12px;
+  }
+
+  .responsive-calendar .rbc-agenda-view {
+    margin: 0;
+  }
+
+  .responsive-calendar .rbc-agenda-content {
+    font-size: 14px;
+  }
+
+  .responsive-calendar .rbc-agenda-date-cell,
+  .responsive-calendar .rbc-agenda-time-cell,
+  .responsive-calendar .rbc-agenda-event-cell {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .responsive-calendar .rbc-row-content {
+    font-size: 12px;
+  }
+}
+
+/* Agenda view specific styles */
+.rbc-agenda-view table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+.rbc-agenda-view table thead > tr > th {
+  padding: 8px;
+}
+
+.rbc-agenda-empty {
+  text-align: center;
+  padding: 16px;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
