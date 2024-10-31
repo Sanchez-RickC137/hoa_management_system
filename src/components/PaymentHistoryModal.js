@@ -4,7 +4,7 @@ import { apiService } from '../services/apiService';
 import { X, Download, Printer } from 'lucide-react';
 import PaymentReceipt from './PaymentReceipt';
 
-const PaymentHistoryModal = ({ payment, onClose }) => {
+const PaymentHistoryModal = ({ paymentId , onClose }) => {
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,11 +16,9 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
       try {
         setLoading(true);
         setError(null);
-        const formattedDate = new Date(payment.date).toISOString().split('T')[0];
-        const positiveAmount = payment.amount.replace(/[()-]/g, '').trim();
-        console.log('Fetching payment details for:', { date: formattedDate, amount: positiveAmount });
-        const response = await apiService.getPaymentDetailsByDateAndAmount(formattedDate, positiveAmount);
-        console.log('Payment details response:', response);
+        
+        console.log('Fetching payment details for payment ID:', paymentId);
+        const response = await apiService.getPaymentDetails(paymentId); // New API method
         setPaymentDetails(response);
       } catch (error) {
         console.error('Error fetching payment details:', error);
@@ -29,22 +27,23 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
         setLoading(false);
       }
     };
-    fetchPaymentDetails();
-  }, [payment.date, payment.amount]);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    fetchPaymentDetails();
+  }, [paymentId]);
+
+  const formatDateTime = (dateString) => {
+    return new Date(dateString).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
   };
 
   const handlePrint = () => {
-    // First ensure receipt is visible
     setShowReceipt(true);
-    
-    // Use setTimeout to ensure the receipt is rendered
     setTimeout(() => {
       const receiptContent = document.getElementById('printable-receipt');
       if (!receiptContent) {
@@ -61,6 +60,7 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
               @media print {
                 body { margin: 0; padding: 20px; }
                 .receipt-content { width: 100%; max-width: 8.5in; margin: 0 auto; }
+                .datetime { font-size: 0.9em; color: #666; }
               }
             </style>
           </head>
@@ -78,7 +78,7 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
         </html>
       `);
       printWindow.document.close();
-    }, 100); // Short delay to ensure content is rendered
+    }, 100);
   };
 
   if (loading) return (
@@ -147,7 +147,12 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
 
             {showReceipt ? (
               <div id="printable-receipt">
-                <PaymentReceipt payment={paymentDetails} />
+                <PaymentReceipt 
+                  payment={{
+                    ...paymentDetails,
+                    formattedDateTime: formatDateTime(paymentDetails.paymentDate)
+                  }} 
+                />
               </div>
             ) : (
               <div className={`space-y-4 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
@@ -156,7 +161,7 @@ const PaymentHistoryModal = ({ payment, onClose }) => {
                     <p className="font-bold text-lg mb-2">Payment Information</p>
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
                       <p><strong>Payment ID:</strong> #{paymentDetails.paymentId.toString().padStart(6, '0')}</p>
-                      <p><strong>Date:</strong> {formatDate(paymentDetails.paymentDate)}</p>
+                      <p><strong>Date/Time:</strong> {formatDateTime(paymentDetails.paymentDate)}</p>
                       <p><strong>Amount:</strong> ${parseFloat(paymentDetails.amount).toFixed(2)}</p>
                       <p><strong>Description:</strong> {paymentDetails.description}</p>
                     </div>

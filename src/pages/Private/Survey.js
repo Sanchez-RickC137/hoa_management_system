@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
 import { Plus } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import Sidebar from '../components/layout/Sidebar';
-import CreateSurveyModal from '../components/CreateSurveyModal';
-import SurveyCompletionModal from '../components/SurveyCompletionModal';
-import SurveyResultsModal from '../components/SurveyResultsModal';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/apiService';
+import Sidebar from '../../components/layout/Sidebar';
+import CreateSurveyModal from '../../components/CreateSurveyModal';
+import SurveyCompletionModal from '../../components/SurveyCompletionModal';
+import SurveyResultsModal from '../../components/SurveyResultsModal';
 
 // Survey Header Section
 const SurveyHeader = ({ activeSurveys, inactiveSurveys, activeView, setActiveView, isBoardMember, setShowCreateModal, isDarkMode }) => {
@@ -85,7 +86,7 @@ const SurveyCard = ({ survey, userResponse, onTakeSurvey, onViewResults }) => {
   };
   
   return (
-    <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-lg flex flex-col h-full`}>
+    <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-lg flex flex-col h-full`}>
       <div className="flex-grow">
         <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
           {survey.MESSAGE}
@@ -185,9 +186,12 @@ const Survey = () => {
 
   if (loading) {
     return (
-      <div className={`flex ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} min-h-screen`}>
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
         <Sidebar />
-        <div className="flex-1 p-10 mt-16 sm:mt-0">Loading surveys...</div>
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
       </div>
     );
   }

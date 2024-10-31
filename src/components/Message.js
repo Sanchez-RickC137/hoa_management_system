@@ -14,11 +14,11 @@ const Message = ({ message, onSelect, currentUserId, isMobileView, isSelected })
         cursor-pointer
         ${isDarkMode 
           ? isSelected
-            ? 'bg-darkblue-dark bg-opacity-40'
-            : 'hover:bg-darkblue-dark hover:bg-opacity-20' 
+            ? 'bg-darkblue-dark bg-opacity-100'
+            : 'hover:bg-darkblue-dark hover:bg-opacity-100' 
           : isSelected
-            ? 'bg-lightgray bg-opacity-40'
-            : 'hover:bg-lightgray hover:bg-opacity-20'
+            ? 'bg-lightgray bg-opacity-100'
+            : 'hover:bg-lightgray hover:bg-opacity-100'
         }
       `}
     >

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
 import { Plus } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import AnnouncementCarousel from '../components/AnnouncementCarousel';
-import AnnouncementCalendar from '../components/AnnouncementCalendar';
-import AnnouncementModal from '../components/AnnouncementModal';
-import CreateAnnouncementModal from '../components/CreateAnnouncementModal';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/apiService';
+import AnnouncementCarousel from '../../components/AnnouncementCarousel';
+import AnnouncementCalendar from '../../components/AnnouncementCalendar';
+import AnnouncementModal from '../../components/AnnouncementModal';
+import CreateAnnouncementModal from '../../components/CreateAnnouncementModal';
+import Sidebar from '../../components/layout/Sidebar';
 
 const AnnouncementsNews = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -57,10 +59,12 @@ const AnnouncementsNews = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${
-        isDarkMode ? 'bg-greenblack-dark text-tanish-dark' : 'bg-tanish-light text-darkblue-light'
-      }`}>
-        Loading announcements...
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
       </div>
     );
   }
@@ -99,7 +103,7 @@ const AnnouncementsNews = () => {
 
       {/* Carousel Section - Vertical on mobile */}
       <div className={`mb-8 p-4 md:p-6 rounded-lg shadow-lg ${
-        isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+        isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
       }`}>
         <h2 className={`text-2xl text-center font-semibold mb-4 ${
           isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'
@@ -117,7 +121,7 @@ const AnnouncementsNews = () => {
 
       {/* Calendar Section */}
       <div className={`p-4 md:p-6 rounded-lg shadow-lg ${
-        isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+        isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
       }`}>
         <AnnouncementCalendar 
           announcements={announcements}

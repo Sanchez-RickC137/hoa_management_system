@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { apiService } from '../services/apiService';
 import { AlertCircle, Calendar, MapPin } from 'lucide-react';
-import ImageDisplay from '../components/ImageDisplay';
-import CardImageDark from '../assets/images/AnnouncementNull.png'
-import CardImageLight from '../assets/images/AnnouncementNullLight.png'
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { apiService } from '../../services/apiService';
+import ImageDisplay from '../../components/ImageDisplay';
+import CardImageDark from '../../assets/images/AnnouncementNull.png'
+import CardImageLight from '../../assets/images/AnnouncementNullLight.png'
 
 const PublicAnnouncements = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -30,8 +31,11 @@ const PublicAnnouncements = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
       </div>
     );
   }
@@ -61,7 +65,7 @@ const PublicAnnouncements = () => {
             <div
               key={announcement.ANNOUNCEMENT_ID}
               className={`rounded-lg shadow-lg overflow-hidden ${
-                isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+                isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
               }`}
             >
               {/* Image container with fixed height */}

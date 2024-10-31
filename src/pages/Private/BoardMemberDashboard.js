@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
 import { 
   Home, FileCog, UserCog, DollarSign, CalendarPlus, CalendarCog,
   AlertTriangle, ClipboardList, Frown, Shuffle,
   UserRoundPlus, FileUp, ClipboardPlus
 } from 'lucide-react';
-import CreateAnnouncementModal from '../components/CreateAnnouncementModal';
-import UploadDocumentModal from '../components/UploadDocumentModal';
-import CreateSurveyModal from '../components/CreateSurveyModal';
-import IssueViolationModal from '../components/IssueViolationModal';
-import UpdateViolationsModal from '../components/UpdateViolationsModal';
-import IssueAssessmentModal from '../components/IssueAssessmentModal';
-import ManageAssessmentsModal from '../components/ManageAssessmentsModal';
-import NewAccountModal from '../components/NewAccountModal';
-import BoardMemberSettingsModal from '../components/BoardMemberSettingsModal';
-import UpdateBoardMembersModal from '../components/UpdateBoardMembersModal';
-import ManageAnnouncementsModal from '../components/ManageAnnouncementsModal';
-import ManageDocumentsModal from '../components/ManageDocumentsModal';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import CreateAnnouncementModal from '../../components/CreateAnnouncementModal';
+import UploadDocumentModal from '../../components/UploadDocumentModal';
+import CreateSurveyModal from '../../components/CreateSurveyModal';
+import IssueViolationModal from '../../components/IssueViolationModal';
+import UpdateViolationsModal from '../../components/UpdateViolationsModal';
+import IssueAssessmentModal from '../../components/IssueAssessmentModal';
+import ManageAssessmentsModal from '../../components/ManageAssessmentsModal';
+import NewAccountModal from '../../components/NewAccountModal';
+import BoardMemberSettingsModal from '../../components/BoardMemberSettingsModal';
+import UpdateBoardMembersModal from '../../components/UpdateBoardMembersModal';
+import ManageAnnouncementsModal from '../../components/ManageAnnouncementsModal';
+import ManageDocumentsModal from '../../components/ManageDocumentsModal';
 
 
 const DashboardCard = ({ icon: Icon, title, description, onClick, disabled }) => {

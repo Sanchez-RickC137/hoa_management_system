@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Plus, Grid, List, ArrowUp, ArrowDown } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import DocumentCard from '../components/DocumentCard';
-import UploadDocumentModal from '../components/UploadDocumentModal';
-import ImageDisplay from '../components/ImageDisplay';
+import { apiService } from '../../services/apiService';
+import DocumentCard from '../../components/DocumentCard';
+import UploadDocumentModal from '../../components/UploadDocumentModal';
+import ImageDisplay from '../../components/ImageDisplay';
+import Sidebar from '../../components/layout/Sidebar';
 
 const Documents = () => {
   const [documents, setDocuments] = useState([]);
@@ -76,7 +78,7 @@ const Documents = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className={`relative w-full max-w-2xl mx-4 rounded-lg shadow-lg ${
-          isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+          isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
         } p-6`}>
           <div className="flex justify-between items-center mb-4">
             <h2 className={`text-2xl font-bold ${
@@ -110,13 +112,16 @@ const Documents = () => {
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center min-h-screen ${
-        isDarkMode ? 'bg-greenblack-dark text-tanish-dark' : 'bg-tanish-light text-darkblue-light'
-      }`}>
-        Loading documents...
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
       </div>
     );
   }
+
 
   return (
     <div className={`min-h-screen p-4 sm:p-6 pt-16 sm:pt-6 ${
@@ -131,7 +136,7 @@ const Documents = () => {
         </h1>
         <div className="flex items-center space-x-4">
           <div className={`flex space-x-2 p-1 rounded-lg ${
-            isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+            isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
           }`}>
             <button
               onClick={() => setViewType('grid')}
@@ -178,7 +183,7 @@ const Documents = () => {
           </h1>
           
           <div className={`flex items-center space-x-2 p-1 rounded-lg ${
-            isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+            isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
           }`}>
             <button
               onClick={() => setViewType('grid')}
@@ -226,7 +231,7 @@ const Documents = () => {
       <div className="mt-6">
         {viewType === 'list' ? (
           <div className={`rounded-lg shadow-lg ${
-            isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
+            isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'
           }`}>
             <div className="flex items-center justify-between p-4 border-b border-opacity-20">
               <button

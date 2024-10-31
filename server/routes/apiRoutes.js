@@ -209,30 +209,39 @@ router.get('/account-details', verifyToken, async (req, res) => {
     `, [accountInfo[0].accountNumber]);
 
     const [paymentHistory] = await pool.query(`
-      (SELECT 'charge' as type, 
-              COALESCE(ac.ASSESS_DATE, ac.VIOLATION_DATE) as date, 
-              CASE 
-                WHEN ac.VIOLATION_TYPE_ID IS NOT NULL THEN vt.VIOLATION_DESCRIPTION
-                ELSE COALESCE(at.ASSESSMENT_DESCRIPTION, 'Charge')
-              END as description,
-              COALESCE(vt.VIOLATION_RATE, ar.AMOUNT) as amount,
-              0 as balance
-       FROM ACCOUNT_CHARGE ac
-       LEFT JOIN VIOLATION_TYPE vt ON ac.VIOLATION_TYPE_ID = vt.TYPE_ID
-       LEFT JOIN ASSESSMENT_TYPE at ON ac.ASSESS_TYPE_ID = at.TYPE_ID
-       LEFT JOIN ASSESSMENT_RATE ar ON ac.RATE_ID = ar.RATE_ID
-       WHERE ac.ACCOUNT_ID = ?)
+      (SELECT 
+          'charge' as type, 
+          CHARGE_ID as chargeId,
+          NULL as paymentId,  -- Return NULL for paymentId
+          COALESCE(ac.ASSESS_DATE, ac.VIOLATION_DATE) as date, 
+          CASE 
+              WHEN ac.VIOLATION_TYPE_ID IS NOT NULL THEN vt.VIOLATION_DESCRIPTION
+              ELSE COALESCE(at.ASSESSMENT_DESCRIPTION, 'Charge')
+          END as description,
+          COALESCE(vt.VIOLATION_RATE, ar.AMOUNT) as amount,
+          0 as balance
+      FROM ACCOUNT_CHARGE ac
+      LEFT JOIN VIOLATION_TYPE vt ON ac.VIOLATION_TYPE_ID = vt.TYPE_ID
+      LEFT JOIN ASSESSMENT_TYPE at ON ac.ASSESS_TYPE_ID = at.TYPE_ID
+      LEFT JOIN ASSESSMENT_RATE ar ON ac.RATE_ID = ar.RATE_ID
+      WHERE ac.ACCOUNT_ID = ?)
+  
       UNION ALL
-      (SELECT 'payment' as type, 
-              DATE_OF_PAYMENT as date, 
-              'Payment' as description, 
-              PAYMENT_AMOUNT as amount,
-              0 as balance
-       FROM PAYMENT
-       WHERE ACCOUNT_ID = ?)
+  
+      (SELECT 
+          'payment' as type, 
+          NULL as chargeId,  -- Return NULL for chargeId
+          PAYMENT_ID as paymentId,
+          DATE_OF_PAYMENT as date, 
+          PAYMENT_DESCRIPTION as description, 
+          PAYMENT_AMOUNT as amount,
+          0 as balance
+      FROM PAYMENT
+      WHERE ACCOUNT_ID = ?)
+  
       ORDER BY date DESC
       LIMIT 50
-    `, [accountInfo[0].accountNumber, accountInfo[0].accountNumber]);
+  `, [accountInfo[0].accountNumber, accountInfo[0].accountNumber]);
 
     let runningBalance = accountInfo[0].balance;
     paymentHistory.forEach(item => {
@@ -543,7 +552,7 @@ router.post('/payments', verifyToken, async (req, res) => {
   }
 });
 
-// Payment Details Route
+// Payment Details Route (Deprecated)
 router.get('/payments/details', verifyToken, async (req, res) => {
   try {
     const { date, amount } = req.query;
@@ -581,7 +590,7 @@ router.get('/payments/details', verifyToken, async (req, res) => {
   }
 });
 
-// Account Charge Route
+// Account Charge Route (Deprecated)
 router.get('/charges/details', verifyToken, async (req, res) => {
   try {
     const { date, amount } = req.query;
@@ -630,6 +639,98 @@ router.get('/charges/details', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Error fetching charge details:', error);
     res.status(500).json({ error: 'An error occurred while fetching charge details' });
+  }
+});
+
+// Get payment details by ID
+router.get('/payments/:paymentId', verifyToken, async (req, res) => {
+  const { paymentId } = req.params;
+  const ownerId = req.userId;
+
+  try {
+    // Get payment details with card info and account info
+    const [payment] = await pool.query(
+      `SELECT 
+        p.*,
+        cc.CARD_TYPE, 
+        cc.CARD_NUMBER_LAST_4
+      FROM PAYMENT p
+      LEFT JOIN CREDIT_CARDS cc ON p.CARD_ID = cc.CARD_ID
+      WHERE p.PAYMENT_ID = ?`,
+      [paymentId]
+    );
+
+    if (payment.length === 0) {
+      return res.status(404).json({ error: 'Payment not found' });
+    }
+
+    res.json({
+      paymentId: payment[0].PAYMENT_ID,
+      accountId: payment[0].ACCOUNT_ID,
+      ownerId: payment[0].OWNER_ID,
+      paymentDate: payment[0].DATE_OF_PAYMENT,
+      amount: payment[0].PAYMENT_AMOUNT,
+      description: payment[0].PAYMENT_DESCRIPTION,
+      cardId: payment[0].CARD_ID,
+      cardType: payment[0].CARD_TYPE,
+      cardLastFour: payment[0].CARD_NUMBER_LAST_4
+    });
+  } catch (error) {
+    console.error('Error fetching payment details:', error);
+    res.status(500).json({ error: 'Failed to fetch payment details' });
+  }
+});
+
+
+// Get charge details by ID
+router.get('/charges/:chargeId', verifyToken, async (req, res) => {
+  const { chargeId } = req.params;
+  const ownerId = req.userId;
+
+  try {
+    // Get charge details with violation info if applicable
+    const [charge] = await pool.query(`
+      SELECT ac.*, 
+             vt.VIOLATION_RATE, vt.VIOLATION_DESCRIPTION,
+             at.ASSESSMENT_DESCRIPTION,
+             ar.AMOUNT as ASSESSMENT_AMOUNT,
+             o.FIRST_NAME, o.LAST_NAME
+      FROM ACCOUNT_CHARGE ac
+      LEFT JOIN VIOLATION_TYPE vt ON ac.VIOLATION_TYPE_ID = vt.TYPE_ID
+      LEFT JOIN ASSESSMENT_TYPE at ON ac.ASSESS_TYPE_ID = at.TYPE_ID
+      LEFT JOIN ASSESSMENT_RATE ar ON ac.RATE_ID = ar.RATE_ID
+      LEFT JOIN BOARD_MEMBER_ADMIN bma ON ac.ISSUED_BY = bma.MEMBER_ID
+      LEFT JOIN OWNER_BOARD_MEMBER_MAP obm ON bma.MEMBER_ID = obm.BOARD_MEMBER_ID
+        AND ac.ASSESS_DATE BETWEEN obm.START_DATE AND IFNULL(obm.END_DATE, CURDATE())
+      LEFT JOIN OWNER o ON obm.OWNER_ID = o.OWNER_ID
+      WHERE ac.CHARGE_ID = ?
+    `, [chargeId]);
+
+    console.log('Matching charge:', charge);
+
+    if (charge.length === 0) {
+      console.log('Charge not found');
+      return res.status(404).json({ error: 'Charge not found' });
+    }
+
+    console.log('Charge details found:', charge[0]);
+    res.json({
+      chargeId: charge[0].CHARGE_ID,
+      accountId: charge[0].ACCOUNT_ID,
+      chargeType: charge[0].CHARGE_TYPE,
+      paymentDueDate: charge[0].PAYMENT_DUE_DATE,
+      assessDate: charge[0].ASSESS_DATE,
+      violationDate: charge[0].VIOLATION_DATE,
+      violationDescription: charge[0].VIOLATION_DESCRIPTION,
+      assessmentDescription: charge[0].ASSESSMENT_DESCRIPTION,
+      amount: charge[0].VIOLATION_RATE || charge[0].ASSESSMENT_AMOUNT,
+      issuedBy: charge[0].ISSUED_BY,
+      issuerName: charge[0].FIRST_NAME && charge[0].LAST_NAME ? 
+        `${charge[0].FIRST_NAME} ${charge[0].LAST_NAME}` : 'Unknown'
+    });
+  } catch (error) {
+    console.error('Error fetching charge details:', error);
+    res.status(500).json({ error: 'Failed to fetch charge details' });
   }
 });
 
@@ -3235,46 +3336,60 @@ router.get('/surveys/:id/results', verifyToken, async (req, res) => {
 });
 
 // Contact Page submission
-router.post('/contact/submit', verifyToken, async (req, res) => {
-  const connection = await pool.getConnection();
+router.post('/contact/submit', async (req, res) => {
   try {
-    await connection.beginTransaction();
-
-    const { subject, message, senderType, senderId } = req.body;
-
-    // Get all board members
-    const [boardMembers] = await connection.query(`
-      SELECT DISTINCT o.OWNER_ID
+    const { subject, message, guestInfo } = req.body;
+    
+    // Get active board members excluding system user (999999999)
+    const [boardMembers] = await pool.execute(`
+      SELECT DISTINCT o.OWNER_ID 
       FROM OWNER o
-      JOIN OWNER_BOARD_MEMBER_MAP obm ON o.OWNER_ID = obm.OWNER_ID
-      WHERE obm.START_DATE <= CURRENT_DATE 
-      AND (obm.END_DATE IS NULL OR obm.END_DATE >= CURRENT_DATE)
+      JOIN OWNER_BOARD_MEMBER_MAP obm ON o.OWNER_ID = obm.OWNER_ID 
+      WHERE obm.END_DATE IS NULL 
+      AND o.OWNER_ID != 999999999
     `);
 
-    // Create the message
-    const [messageResult] = await connection.query(
-      'INSERT INTO MESSAGE (SENDER_ID, MESSAGE, CREATED) VALUES (?, ?, NOW())',
-      [senderId || 999999999, `Subject: ${subject}\n\n${message}`]
+    if (boardMembers.length === 0) {
+      return res.status(500).json({ error: 'No active board members found' });
+    }
+
+    // Format the message with guest info
+    const formattedMessage = `
+      Contact Form Submission
+
+      From: ${guestInfo.name}
+      Email: ${guestInfo.email}
+      Subject: ${subject}
+
+      Message:
+      ${message}
+
+      Submitted: ${new Date().toLocaleString()}
+          `.trim();
+
+    // Insert the message once
+    const [messageResult] = await pool.execute(
+      'INSERT INTO MESSAGE (MESSAGE, CREATED, SENDER_ID) VALUES (?, NOW(), 999999999)',
+      [formattedMessage]
     );
 
     const messageId = messageResult.insertId;
 
-    // Create message mappings for all board members
-    for (const boardMember of boardMembers) {
-      await connection.query(
-        'INSERT INTO OWNER_MESSAGE_MAP (OWNER_ID, MESSAGE_ID) VALUES (?, ?)',
-        [boardMember.OWNER_ID, messageId]
-      );
-    }
+    // Create message mappings for each board member
+    const messageMapValues = boardMembers.map(member => 
+      [member.OWNER_ID, messageId, false]
+    ).join('),(');
 
-    await connection.commit();
-    res.json({ success: true, messageId });
+    await pool.execute(`
+      INSERT INTO OWNER_MESSAGE_MAP (OWNER_ID, MESSAGE_ID, IS_READ) 
+      VALUES (${messageMapValues})
+    `);
+
+    res.status(201).json({ success: true });
+
   } catch (error) {
-    await connection.rollback();
-    console.error('Error submitting contact form:', error);
-    res.status(500).json({ error: 'Failed to submit contact form' });
-  } finally {
-    connection.release();
+    console.error('Error sending contact message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
   }
 });
 

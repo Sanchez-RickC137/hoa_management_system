@@ -27,7 +27,7 @@ const MessageList = ({ messages, view, onSelectMessage, currentUserId, isMobileV
 
   return (
     <div className="h-full overflow-hidden">
-      <div className={`h-full overflow-x-hidden overflow-y-auto divide-y ${isDarkMode ? 'divide-darkblue-dark' : 'divide-darkblue-light'}`}>
+      <div className={`h-full overflow-x-hidden overflow-y-auto divide-y ${isDarkMode ? 'bg-greenblack-light divide-darkblue-dark' : 'bg-oldlace divide-darkblue-light'}`}>
         {view === 'conversations'
           ? Object.entries(groupedMessages)
               .sort(([, a], [, b]) => new Date(b[0].CREATED) - new Date(a[0].CREATED))

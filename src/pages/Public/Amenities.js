@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { useState } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   Home,
   Waves,
@@ -55,6 +55,7 @@ const InfoBox = ({ title, content }) => {
 
 const Amenities = () => {
   const { isDarkMode } = useTheme();
+  const [loading, setLoading] = useState(true);
 
   const specialEvents = [
     "Summer BBQ & Pool Party: Celebrate summer with neighbors, food, and fun by the pool.",
@@ -66,7 +67,7 @@ const Amenities = () => {
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} rounded-lg shadow-lg`}>
       <div className="container mx-auto px-6 py-12">
-        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-lg p-8`}>
+        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-lg p-8`}>
           {/* Welcome Section */}
           <div className="text-center mb-12">
             <h1 className={`text-4xl font-bold mb-6 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>

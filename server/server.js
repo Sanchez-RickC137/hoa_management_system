@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const apiRoutes = require('./routes/apiRoutes');
 const { scheduleJob } = require('node-schedule');
+const { processSurveyResults } = require('./utils/surveyUtils');
 
 const app = express();
 app.use(cors());

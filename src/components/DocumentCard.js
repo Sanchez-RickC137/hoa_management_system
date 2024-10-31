@@ -44,7 +44,7 @@ const DocumentCard = ({ document, onClick, viewType = 'grid' }) => {
     <div 
       onClick={() => onClick(document)}
       className={`p-4 rounded-lg shadow-lg cursor-pointer ${
-        isDarkMode ? 'bg-greenblack-light hover:bg-darkblue-dark' : 'bg-softcoral hover:bg-palebluegrey'
+        isDarkMode ? 'bg-greenblack-light hover:bg-darkblue-dark' : 'bg-oldlace hover:bg-palebluegrey'
       } transition-colors duration-200`}
     >
       <div className="flex items-center justify-between mb-4">

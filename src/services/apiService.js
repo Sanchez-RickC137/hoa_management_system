@@ -116,7 +116,10 @@ class ApiService {
   async submitPayment(paymentData) {
     try {
       this.logApiCall('POST', '/payments', paymentData);
-      const response = await axiosPrivate.post('/payments', paymentData);
+      const response = await axiosPrivate.post('/payments', {
+        ...paymentData,
+        paymentDate: new Date().toISOString() // Ensure we send ISO datetime
+      });
       console.log('Payment submitted successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -128,26 +131,57 @@ class ApiService {
     try {
       this.logApiCall('GET', '/payments/history');
       const response = await axiosPrivate.get('/payments/history');
-      console.log('Payment history received:', response.data);
-      return response.data;
+      // Sort payments by datetime in descending order
+      const sortedPayments = response.data.sort((a, b) => 
+        new Date(b.DATE_OF_PAYMENT) - new Date(a.DATE_OF_PAYMENT)
+      );
+      console.log('Payment history received:', sortedPayments);
+      return sortedPayments;
     } catch (error) {
       this.handleError(error, 'getPaymentHistory');
     }
   }
 
-  async getPaymentDetailsByDateAndAmount(date, amount) {
+  async getPaymentDetails(paymentId) {
     try {
-      this.logApiCall('GET', '/payments/details', { date, amount });
+      this.logApiCall('GET', `/payments/${paymentId}`);
+      const response = await axiosPrivate.get(`/payments/${paymentId}`);
+      console.log('Payment details received:', response.data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error, `getPaymentDetails for payment ${paymentId}`);
+    }
+  }
+
+  async getChargeDetails(chargeId) {
+    try {
+      this.logApiCall('GET', `/charges/${chargeId}`);
+      const response = await axiosPrivate.get(`/charges/${chargeId}`);
+      console.log('Charge details received:', response.data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error, `getChargeDetails for charge ${chargeId}`);
+    }
+  }
+
+  // Deprecated
+  async getPaymentDetailsByDateAndAmount(datetime, amount) {
+    try {
+      this.logApiCall('GET', '/payments/details', { datetime, amount });
       const response = await axiosPrivate.get('/payments/details', { 
-        params: { date, amount } 
+        params: { 
+          datetime: datetime,
+          amount: amount 
+        } 
       });
       console.log('Payment details received:', response.data);
       return response.data;
     } catch (error) {
-      this.handleError(error, `getPaymentDetailsByDateAndAmount for date ${date} and amount ${amount}`);
+      this.handleError(error, `getPaymentDetailsByDateAndAmount for datetime ${datetime} and amount ${amount}`);
     }
   }
 
+  // Deprecated
   async getChargeDetailsByDateAndAmount(date, amount) {
     try {
       this.logApiCall('GET', '/charges/details', { date, amount });
@@ -740,12 +774,18 @@ class ApiService {
     }
   }
 
-  // System Messages
+  // System Messages from contact form
   async sendSystemMessage(messageData) {
     try {
       this.logApiCall('POST', '/contact/submit', messageData);
-      const response = await axiosPrivate.post('/contact/submit', messageData);
-      console.log('System message sent successfully:', response.data);
+      const response = await axiosPublic.post('/contact/submit', {
+        subject: messageData.subject,
+        message: messageData.message,
+        guestInfo: {
+          name: messageData.guestInfo.name,
+          email: messageData.guestInfo.email
+        }
+      });
       return response.data;
     } catch (error) {
       this.handleError(error, 'sendSystemMessage');

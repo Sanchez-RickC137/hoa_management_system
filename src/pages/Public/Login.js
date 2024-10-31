@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { authService } from '../services/authService';
-import ForgotPasswordModal from '../components/ForgotPasswordModal';
-import SummitRidgeBackground from '../assets/images/SummitRidge_Background.webp';
-import RegistrationModal from '../components/RegistrationModal';
-import ChangePasswordModal from '../components/ChangePasswordModal';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { authService } from '../../services/authService';
+import ForgotPasswordModal from '../../components/ForgotPasswordModal';
+import SummitRidgeBackground from '../../assets/images/SummitRidge_Background.webp';
+import RegistrationModal from '../../components/RegistrationModal';
+import ChangePasswordModal from '../../components/ChangePasswordModal';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -114,7 +114,7 @@ const Login = () => {
               {error && <p className="text-red-500 mb-4">{error}</p>}
               <form className="space-y-6" onSubmit={handleRegisterSubmit}>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Account Number</label>
+                  <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Account Number</label>
                   <input
                     type="text"
                     value={regAccount}
@@ -124,7 +124,7 @@ const Login = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Owner ID</label>
+                  <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Owner ID</label>
                   <input
                     type="text"
                     value={regOwner}
@@ -134,7 +134,7 @@ const Login = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Temporary Code</label>
+                  <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Temporary Code</label>
                   <input
                     type="password"
                     value={regCode}
@@ -169,7 +169,7 @@ const Login = () => {
               {error && <p className="text-red-500 mb-4">{error}</p>}
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Email Address</label>
+                  <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Email Address</label>
                   <input
                     type="email"
                     value={email}
@@ -179,7 +179,7 @@ const Login = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Password</label>
+                  <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Password</label>
                   <input
                     type="password"
                     value={password}
@@ -192,7 +192,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowForgotPasswordModal(true)}
-                    className="text-sm hover:underline"
+                    className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} text-sm hover:underline`}
                   >
                     Forgot Password?
                   </button>
@@ -242,7 +242,7 @@ const Login = () => {
           {!isLoginView ? (
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-sm font-medium mb-1">Email Address</label>
+                <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Email Address</label>
                 <input
                   type="email"
                   value={email}
@@ -252,7 +252,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Password</label>
+                <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Password</label>
                 <input
                   type="password"
                   value={password}
@@ -265,7 +265,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowForgotPasswordModal(true)}
-                  className="text-sm hover:underline"
+                  className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} text-sm hover:underline`}
                 >
                   Forgot Password?
                 </button>
@@ -282,7 +282,7 @@ const Login = () => {
           ) : (
             <form className="space-y-4" onSubmit={handleRegisterSubmit}>
               <div>
-                <label className="block text-sm font-medium mb-1">Account Number</label>
+                <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Account Number</label>
                 <input
                   type="text"
                   value={regAccount}
@@ -292,7 +292,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Owner ID</label>
+                <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Owner ID</label>
                 <input
                   type="text"
                   value={regOwner}
@@ -302,7 +302,7 @@ const Login = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Temporary Code</label>
+                <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Temporary Code</label>
                 <input
                   type="password"
                   value={regCode}

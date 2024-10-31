@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTheme } from '../contexts/ThemeContext';
+import React, { useState } from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   Users,
   Home,
@@ -59,11 +59,12 @@ const ServiceCard = ({ title, description, icon: Icon }) => {
 
 const About = () => {
   const { isDarkMode } = useTheme();
+  const [loading, setLoading] = useState(true);
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} rounded-lg shadow-lg`}>
       <div className="container mx-auto px-6 py-12">
-        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-lg p-8`}>
+        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-lg p-8`}>
           {/* Welcome Section */}
           <div className="text-center mb-12">
             <h1 className={`text-4xl font-bold mb-6 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>

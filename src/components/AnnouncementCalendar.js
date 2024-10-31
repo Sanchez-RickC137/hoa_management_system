@@ -63,9 +63,9 @@ const AnnouncementCalendar = ({ announcements, onEventClick }) => {
 
   return (
     <div className="flex flex-col">
-      <h2 className={`text-xl md:text-2xl font-semibold mb-2 md:mb-4 text-center text-tanish-dark ${
-        windowWidth < 768 ? 'mt-2' : ''
-      }`}>
+      <h2 className={`text-xl md:text-2xl font-semibold mb-2 md:mb-4 text-center ${
+        isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'
+      } ${windowWidth < 768 ? 'mt-2' : ''}`}>
         Events Calendar
       </h2>
       <div className={`
@@ -79,8 +79,8 @@ const AnnouncementCalendar = ({ announcements, onEventClick }) => {
         <style>
           {`
             .rbc-calendar {
-              background-color: #2B2F2D !important;
-              color: #E5E1D8 !important;
+              background-color: ${isDarkMode ? '#2B2F2D' : '#FFFFFF'} !important;
+              color: ${isDarkMode ? '#E5E1D8' : '#2B2F2D'} !important;
             }
             
             .rbc-toolbar {
@@ -108,62 +108,63 @@ const AnnouncementCalendar = ({ announcements, onEventClick }) => {
             .rbc-toolbar button {
               padding: ${windowWidth < 768 ? '0.25rem 0.5rem' : '0.5rem 1rem'} !important;
               font-size: ${windowWidth < 768 ? '0.75rem' : '0.875rem'} !important;
-              color: #2B2F2D !important;  /* Dark text color */
-              background-color: #E5E1D8 !important;  /* Light background */
-              border: 1px solid #354856 !important;
+              color: ${isDarkMode ? '#2B2F2D' : '#FFFFFF'} !important;
+              background-color: ${isDarkMode ? '#E5E1D8' : '#2B2F2D'} !important;
+              border: 1px solid ${isDarkMode ? '#354856' : '#D1D5DB'} !important;
             }
             
             .rbc-toolbar button:hover {
-               background-color: #c8c4bc !important;  /* Slightly darker on hover */
+              background-color: ${isDarkMode ? '#c8c4bc' : '#4B5563'} !important;
             }
               
             .rbc-toolbar button.rbc-active {
-              background-color: #4B7F52 !important;  /* Use green for active state */
-              color: #E5E1D8 !important;  /* Light text for contrast */
+              background-color: ${isDarkMode ? '#4B7F52' : '#2C5234'} !important;
+              color: #FFFFFF !important;
             }
 
             .rbc-toolbar button.rbc-active:hover {
-              background-color: #3d6642 !important;  /* Darker green on hover */
+              background-color: ${isDarkMode ? '#3d6642' : '#234228'} !important;
             }
 
             .rbc-month-view,
             .rbc-agenda-view table {
-              border: 1px solid #354856 !important;
-              background-color: #2B2F2D !important;
+              border: 1px solid ${isDarkMode ? '#354856' : '#E5E7EB'} !important;
+              background-color: ${isDarkMode ? '#2B2F2D' : '#FFFFFF'} !important;
               border-radius: 0.5rem;
               overflow: hidden;
             }
 
             .rbc-month-row,
             .rbc-day-bg {
-              border-color: #354856 !important;
+              border-color: ${isDarkMode ? '#354856' : '#E5E7EB'} !important;
             }
 
             .rbc-off-range-bg {
-              background-color: rgba(53, 72, 86, 0.4) !important;
+              background-color: ${isDarkMode ? 'rgba(53, 72, 86, 0.4)' : 'rgba(229, 231, 235, 0.4)'} !important;
             }
 
             .rbc-off-range {
-              color: #6B7280 !important;
+              color: ${isDarkMode ? '#6B7280' : '#9CA3AF'} !important;
             }
 
             .rbc-today {
-              background-color: #354856 !important;
+              background-color: ${isDarkMode ? '#354856' : '#F3F4F6'} !important;
             }
 
             .rbc-header {
-              background-color: #354856 !important;
-              color: #E5E1D8 !important;
+              background-color: ${isDarkMode ? '#354856' : '#F9FAFB'} !important;
+              color: ${isDarkMode ? '#E5E1D8' : '#1F2937'} !important;
               padding: ${windowWidth < 768 ? '0.25rem' : '0.75rem'};
               font-weight: bold;
               font-size: ${windowWidth < 768 ? '0.75rem' : '0.875rem'};
+              border-bottom: 1px solid ${isDarkMode ? '#4B5563' : '#E5E7EB'};
             }
 
             .rbc-event {
-              background-color: #4B7F52 !important;
+              background-color: ${isDarkMode ? '#4B7F52' : '#2C5234'} !important;
               border: none !important;
               border-radius: 0.25rem;
-              color: #E5E1D8 !important;
+              color: #FFFFFF !important;
             }
 
             .rbc-agenda-view {
@@ -174,8 +175,8 @@ const AnnouncementCalendar = ({ announcements, onEventClick }) => {
             }
 
             .rbc-agenda-empty {
-              color: #E5E1D8 !important;
-              background-color: #2B2F2D !important;
+              color: ${isDarkMode ? '#E5E1D8' : '#1F2937'} !important;
+              background-color: ${isDarkMode ? '#2B2F2D' : '#FFFFFF'} !important;
               padding: 1rem;
               text-align: center;
             }
@@ -189,12 +190,12 @@ const AnnouncementCalendar = ({ announcements, onEventClick }) => {
             .rbc-agenda-event-cell {
               padding: ${windowWidth < 768 ? '0.5rem' : '0.75rem'} !important;
               font-size: ${windowWidth < 768 ? '0.875rem' : '1rem'} !important;
-              color: #E5E1D8 !important;
+              color: ${isDarkMode ? '#E5E1D8' : '#1F2937'} !important;
             }
 
             .rbc-agenda-view table thead {
               font-size: ${windowWidth < 768 ? '0.75rem' : '0.875rem'} !important;
-              background-color: #354856 !important;
+              background-color: ${isDarkMode ? '#354856' : '#F9FAFB'} !important;
             }
 
             .rbc-agenda-view table tbody > tr {

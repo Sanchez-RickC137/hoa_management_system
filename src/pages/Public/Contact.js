@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Mail, 
   Phone, 
@@ -16,8 +16,8 @@ import {
   HelpCircle,
   Globe
 } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import XIcon from '../assets/images/XIcon';  // Using our custom X icon
+import { apiService } from '../../services/apiService';
+import XIcon from '../../assets/images/XIcon';  // Using our custom X icon
 
 const ContactSection = ({ title, icon: Icon, children }) => {
   const { isDarkMode } = useTheme();
@@ -237,7 +237,7 @@ const Contact = () => {
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} rounded-lg shadow-lg`}>
       <div className="container mx-auto px-6 py-12">
-        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-lg p-8`}>
+        <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-lg p-8`}>
           <div className="text-center mb-12">
             <h1 className={`text-4xl font-bold mb-6 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
               Contact Summit Ridge HOA

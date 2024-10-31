@@ -3,7 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { apiService } from '../services/apiService';
 import { X } from 'lucide-react';
 
-const ChargeDetailsModal = ({ charge, onClose }) => {
+const ChargeDetailsModal = ({ chargeId, onClose }) => {
   const [chargeDetails, setChargeDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,10 +14,8 @@ const ChargeDetailsModal = ({ charge, onClose }) => {
       try {
         setLoading(true);
         setError(null);
-        const formattedDate = new Date(charge.date).toISOString().split('T')[0];
-        const positiveAmount = charge.amount.replace(/[()-]/g, '').trim();
-        console.log('Fetching charge details for:', { date: formattedDate, amount: positiveAmount });
-        const response = await apiService.getChargeDetailsByDateAndAmount(formattedDate, positiveAmount);
+        console.log('Fetching charge details for:', { chargeId });
+        const response = await apiService.getChargeDetails(chargeId);
         setChargeDetails(response);
       } catch (error) {
         console.error('Error fetching charge details:', error);
@@ -27,7 +25,7 @@ const ChargeDetailsModal = ({ charge, onClose }) => {
       }
     };
     fetchChargeDetails();
-  }, [charge.date, charge.amount]);
+  }, [chargeId]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

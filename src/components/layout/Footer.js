@@ -66,7 +66,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <FooterLink to="/">Home</FooterLink>
               <FooterLink to="/login">Login</FooterLink>
-              <FooterLink to="/news-events">News & Events</FooterLink>
+              <FooterLink to="/public-announcements">News & Events</FooterLink>
               <FooterLink to="/contact">Help Center</FooterLink>
             </ul>
           </div>

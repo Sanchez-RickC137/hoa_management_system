@@ -40,15 +40,23 @@ const PaymentModal = ({ accountInfo, onClose, onPaymentSubmit }) => {
     try {
       setSubmitting(true);
       setError(null);
+      
       const paymentData = {
         amount: parseFloat(paymentAmount),
         description: paymentDescription || 'Payment',
         cardId: selectedCard,
-        accountId: accountInfo.accountNumber
+        accountId: accountInfo.accountNumber,
+        timestamp: new Date().toISOString() // Include exact timestamp
       };
+
       const response = await apiService.submitPayment(paymentData);
-      onPaymentSubmit(response);
-      onClose();
+      
+      if (response.success) {
+        // Ensure the parent component gets updated
+        await onPaymentSubmit(response);
+      } else {
+        setError('Payment failed to process. Please try again.');
+      }
     } catch (error) {
       console.error('Error submitting payment:', error);
       setError('Failed to process payment. Please try again.');

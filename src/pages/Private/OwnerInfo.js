@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
 import { User, Mail, Key, Pencil } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import Sidebar from '../components/layout/Sidebar';
-import ChangePasswordModal from '../components/ChangePasswordModal';
-import NotificationPreferencesModal from '../components/NotificationPreferencesModal';
-import PersonalInfoModal from '../components/PersonalInfoModal';
-import ContactInfoModal from '../components/ContactInfoModal';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { apiService } from '../../services/apiService';
+import Sidebar from '../../components/layout/Sidebar';
+import ChangePasswordModal from '../../components/ChangePasswordModal';
+import NotificationPreferencesModal from '../../components/NotificationPreferencesModal';
+import PersonalInfoModal from '../../components/PersonalInfoModal';
+import ContactInfoModal from '../../components/ContactInfoModal';
 
 const InfoSection = ({ title, icon: Icon, children, onEdit, hideEdit }) => {
   const { isDarkMode } = useTheme();
   return (
-    <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-md h-full`}>
+    <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-md h-full`}>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <Icon className={`w-6 h-6 mr-2 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`} />
@@ -101,12 +102,17 @@ const OwnerInfo = () => {
     }
   };
 
-  if (loading) return (
-    <div className={`flex ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} min-h-screen`}>
-      <Sidebar />
-      <div className="flex-1 p-10">Loading...</div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
+      </div>
+    );
+  }
 
   if (error) return (
     <div className={`flex ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} min-h-screen`}>

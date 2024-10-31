@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
 import { CreditCard, DollarSign } from 'lucide-react';
-import { apiService } from '../services/apiService';
-import Sidebar from '../components/layout/Sidebar';
-import PaymentModal from '../components/PaymentModal';
-import CardManagementModal from '../components/CardManagementModal';
-import PaymentHistoryModal from '../components/PaymentHistoryModal';
-import ChargeDetailsModal from '../components/ChargeDetailsModal';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { apiService } from '../../services/apiService';
+import Sidebar from '../../components/layout/Sidebar';
+import PaymentModal from '../../components/PaymentModal';
+import CardManagementModal from '../../components/CardManagementModal';
+import PaymentHistoryModal from '../../components/PaymentHistoryModal';
+import ChargeDetailsModal from '../../components/ChargeDetailsModal';
 
 const Payments = () => {
   const [paymentData, setPaymentData] = useState(null);
@@ -39,37 +40,74 @@ const Payments = () => {
   };
 
   const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    
     // Full format for md screens and up
     const fullFormat = new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: date.getHours() !== 0 || date.getMinutes() !== 0 ? 'numeric' : undefined,
+      minute: date.getHours() !== 0 || date.getMinutes() !== 0 ? '2-digit' : undefined,
     });
-
+  
     // Abbreviated format for small screens
     const shortFormat = new Date(dateString).toLocaleDateString('en-US', {
-      // year: '2-digit',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      hour: date.getHours() !== 0 || date.getMinutes() !== 0 ? 'numeric' : undefined,
+      minute: date.getHours() !== 0 || date.getMinutes() !== 0 ? '2-digit' : undefined,
     });
-
+  
     return { fullFormat, shortFormat };
   };
 
   const calculateRunningBalance = (transactions) => {
     let runningBalance = 0;
-    return transactions.map(item => {
-      if (item.type === 'charge') {
-        runningBalance += parseFloat(item.amount);
-      } else {
-        runningBalance -= parseFloat(item.amount);
+    // Sort transactions by date and type
+    const sortedTransactions = [...transactions].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateA.getTime() === dateB.getTime()) {
+        // If same datetime, charges come before payments
+        if (a.type === 'charge' && b.type === 'payment') return -1;
+        if (a.type === 'payment' && b.type === 'charge') return 1;
+        return 0;
       }
-      return { ...item, balance: formatCurrency(runningBalance) };
+      
+      return dateA - dateB;
     });
+
+    console.log(sortedTransactions);
+  
+    return sortedTransactions.map(item => ({
+      ...item,
+      // Preserve the original IDs from the backend
+      id: item.type === 'payment' ? item.PAYMENT_ID : item.CHARGE_ID,
+      balance: formatCurrency(runningBalance += (item.type === 'charge' ? 
+        parseFloat(item.amount) : -parseFloat(item.amount)))
+    }));
   };
 
+  
+
   const groupTransactionsByYear = (transactions) => {
-    const sortedTransactions = [...transactions].reverse();
+    // Sort in reverse chronological order, with payments after charges for same datetime
+    const sortedTransactions = [...transactions].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateB.getTime() === dateA.getTime()) {
+        // If same datetime, payments come before charges in reverse order
+        if (a.type === 'payment' && b.type === 'charge') return -1;
+        if (a.type === 'charge' && b.type === 'payment') return 1;
+        return 0;
+      }
+      
+      return dateB - dateA;
+    });
+  
     return sortedTransactions.reduce((groups, transaction) => {
       const year = new Date(transaction.date).getFullYear();
       if (!groups[year]) {
@@ -80,7 +118,18 @@ const Payments = () => {
     }, {});
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className={`flex min-h-screen ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'}`}>
+        <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
+          {isDarkMode && (<FourSquare color='#D6C6B0' size="large" text="Loading" textColor="#D6C6B0"/>)}
+          {!isDarkMode && (<FourSquare color='#2A3A4A' size="large" text="Loading" textColor="#2A3A4A"/>)}
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <div>Error: {error}</div>;
   if (!paymentData) return <div>No payment data available.</div>;
 
@@ -102,7 +151,7 @@ const Payments = () => {
 
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Balance Card */}
-          <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-md`}>
+          <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-md`}>
             <div className="flex flex-col">
               <h2 className={`text-4xl text-center font-bold mb-2 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
                 Account Balance
@@ -114,7 +163,7 @@ const Payments = () => {
           </div>
 
           {/* Actions Card */}
-          <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-md`}>
+          <div className={`p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-md`}>
             <div className="flex flex-col sm:flex-row justify-evenly gap-4 h-full items-center">
               <button
                 onClick={() => setShowPaymentModal(true)}
@@ -139,7 +188,7 @@ const Payments = () => {
             <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
               {year}
             </h3>
-            <div className={`p-2 md:p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} rounded-lg shadow-md overflow-x-auto`}>
+            <div className={`p-2 md:p-6 ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} rounded-lg shadow-md overflow-x-auto`}>
               <table className={`w-full border-collapse ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'} rounded-lg`}>
                 {/* Desktop View Structure */}
                 <colgroup className="hidden md:table-column-group">
@@ -252,12 +301,19 @@ const Payments = () => {
         <PaymentModal
           accountInfo={accountInfo}
           onClose={() => setShowPaymentModal(false)}
-          onPaymentSubmit={() => {
-            setShowPaymentModal(false);
-            fetchPaymentData();
+          onPaymentSubmit={async () => {
+            try {
+              setShowPaymentModal(false);
+              // Immediately refresh the payment data
+              await fetchPaymentData();
+            } catch (error) {
+              console.error('Error refreshing payment data:', error);
+              setError('Payment processed successfully but failed to refresh data. Please reload the page.');
+            }
           }}
         />
       )}
+
 
       {showCardManagementModal && (
         <CardManagementModal
@@ -268,14 +324,14 @@ const Payments = () => {
 
       {selectedTransaction && selectedTransaction.type === 'payment' && (
         <PaymentHistoryModal
-          payment={selectedTransaction}
+          paymentId={selectedTransaction.paymentId}
           onClose={() => setSelectedTransaction(null)}
         />
       )}
 
       {selectedTransaction && selectedTransaction.type === 'charge' && (
         <ChargeDetailsModal
-          charge={selectedTransaction}
+          chargeId={selectedTransaction.chargeId}
           onClose={() => setSelectedTransaction(null)}
         />
       )}

@@ -22,7 +22,8 @@ module.exports = {
         warmlightgrey: '#D1D1D1',
         slategray: '#7C858E',
         mutedolive: '#B3A895',
-        softcoral: '#E9C3AA',
+        softcoral: '#E9C3AA', // E9C3AA
+        oldlace: '#FDF3E5', // Replace softcoral in non modals. FDF3E5
         dustyrose: '#C6A5A1',
         warmtaupe: '#B39E8A',
         sagegreen: '#A3B4A2',

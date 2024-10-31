@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { X, Calendar, Clock, MapPin, Download } from 'lucide-react';
-import ImageDisplay from '../components/ImageDisplay';
+import ImageDisplay from './ImageDisplay';
 
 const AnnouncementModal = ({ announcement, onClose }) => {
   const { isDarkMode } = useTheme();

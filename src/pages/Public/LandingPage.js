@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import SummitLodge from '../assets/images/SummitLodgeClubhouse.png';
-import Announce from '../assets/images/Announcements.jpeg';
-import MemberPortal from '../assets/images/MemberPortal.jpeg';
-import LogoLight from '../assets/images/SummitRidgeLogoLight.png';
-import LogoDark from '../assets/images/SummitRidgeLogoDark.png';
-import { useTheme } from '../contexts/ThemeContext';
+import SummitLodge from '../../assets/images/SummitLodgeClubhouse.png';
+import Announce from '../../assets/images/Announcements.jpeg';
+import MemberPortal from '../../assets/images/MemberPortal.jpeg';
+import LogoLight from '../../assets/images/SummitRidgeLogoLight.png';
+import LogoDark from '../../assets/images/SummitRidgeLogoDark.png';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const LandingPage = () => {
   const { isDarkMode } = useTheme();
@@ -15,13 +15,12 @@ const LandingPage = () => {
     <div className="container mx-auto px-4 py-12">
       <div className="space-y-12">
         <div className={`${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} p-6 rounded-lg shadow-lg text-center`}>
-          {/* <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-4`}>Welcome to Summit Ridge</h1> */}
           <div className="flex justify-center align-center">
             {isDarkMode && <img src={LogoLight} alt="Summit Ridge Logo"></img>}
             {!isDarkMode && <img src={LogoDark} alt="Summit Ridge Logo"></img>}
           </div>
           <p className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} text-3xl mb-4`}>Reaching New Heights in Florida Living</p>
-          <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'} p-6 rounded-lg shadow-lg`}>
+          <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} p-6 rounded-lg shadow-lg`}>
             <p className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-4`}>
               Nestled in the heart of Somewhere, Florida, Summit Ridge is a one-of-a-kind community that embraces the humor and charm of a mountain-themed neighborhood. While Florida's highest peak might just be our clubhouse roof, we aim to deliver a unique living experience rooted in a strong sense of community, fun, and top-quality HOA services.
             </p>
@@ -35,7 +34,7 @@ const LandingPage = () => {
           <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-6 text-center`}>Community Features</h2>
           <div className="grid grid-cols-1 gap-8">
           
-            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-softcoral text-darkblue-light'} rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row h-full`}>
+            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-oldlace text-darkblue-light'} rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row h-full`}>
               <div className="md:w-1/2 h-64">
                 <img src={SummitLodge} alt="Summit Lodge" className="w-full h-full object-cover" />
               </div>
@@ -52,7 +51,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-softcoral text-darkblue-light'} bg-opacity-80 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row md:flex-row-reverse h-full`}>
+            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-oldlace text-darkblue-light'} bg-opacity-80 rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row md:flex-row-reverse h-full`}>
               <div className="md:w-1/2 h-64">
                 <img src={Announce} alt="Community Events" className="w-full h-full object-cover" />
               </div>
@@ -69,7 +68,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-softcoral text-darkblue-light'} rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row h-full`}>
+            <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-oldlace text-darkblue-light'} rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row h-full`}>
               <div className="md:w-1/2 h-64">
                 <img src={MemberPortal} alt="Member Portal" className="w-full h-full object-cover" />
               </div>
@@ -90,7 +89,7 @@ const LandingPage = () => {
 
         <div className={`${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} p-6 rounded-lg shadow-lg text-center`}>
           <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-4 text-center`}>Our Vision</h2>
-          <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-softcoral text-darkblue-light'} rounded-lg shadow-lg overflow-hidden h-full`}>
+          <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark': 'bg-oldlace text-darkblue-light'} rounded-lg shadow-lg overflow-hidden h-full`}>
             <div>
               <p className="mb-4">
                 At Summit Ridge, we strive to elevate the quality of life for our residents while fostering a sense of fun, community, and pride in where we live. We aim to create a living experience that transcends the ordinary, turning everyday life into a series of small adventures.

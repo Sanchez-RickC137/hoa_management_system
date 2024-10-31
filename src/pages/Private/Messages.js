@@ -1,14 +1,16 @@
-// Messages.js
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
-import { apiService } from '../services/apiService';
-import MessageList from '../components/MessageList';
-import MessageDetail from '../components/MessageDetail';
-import MessageViewer from '../components/MessageViewer';
-import NewMessageModal from '../components/NewMessageModal';
-import ReplyMessageModal from '../components/ReplyMessageModal';
 import { Plus, ArrowLeft } from 'lucide-react';
+import { FourSquare } from 'react-loading-indicators';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/apiService';
+import MessageList from '../../components/MessageList';
+import MessageDetail from '../../components/MessageDetail';
+import MessageViewer from '../../components/MessageViewer';
+import NewMessageModal from '../../components/NewMessageModal';
+import ReplyMessageModal from '../../components/ReplyMessageModal';
+import Sidebar from '../../components/layout/Sidebar';
+
 
 const Messages = () => {
   const [messages, setMessages] = useState([]);
@@ -85,8 +87,10 @@ const Messages = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-greenblack-dark text-tanish-dark' : 'bg-tanish-light text-darkblue-light'}`}>
-        Loading messages...
+      <div className={`flex justify-center align-center ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} min-h-screen`}>
+        <Sidebar />
+        {isDarkMode && <FourSquare color='#D6C6B0' size="large" text="Loading" textColor="" />}
+        {!isDarkMode && <FourSquare color='#2A3A4A' size="large" text="Loading" textColor="" />}
       </div>
     );
   }
