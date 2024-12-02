@@ -13,6 +13,7 @@ export const axiosPrivate = axios.create({
 axiosPrivate.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem('token');
+    console.log('Token being added to request:', token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

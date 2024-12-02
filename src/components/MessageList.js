@@ -8,9 +8,15 @@ const MessageList = ({ messages, view, onSelectMessage, currentUserId, isMobileV
 
   const getRootMessage = (message, allMessages) => {
     let currentMessage = message;
+    const visited = new Set(); // Prevent infinite loops
+    
     while (currentMessage.PARENT_MESSAGE_ID) {
-      currentMessage = allMessages.find(m => m.MESSAGE_ID === currentMessage.PARENT_MESSAGE_ID);
-      if (!currentMessage) break;
+      if (visited.has(currentMessage.MESSAGE_ID)) break;
+      visited.add(currentMessage.MESSAGE_ID);
+      
+      const parent = allMessages.find(m => m.MESSAGE_ID === currentMessage.PARENT_MESSAGE_ID);
+      if (!parent) break;
+      currentMessage = parent;
     }
     return currentMessage;
   };
@@ -30,7 +36,7 @@ const MessageList = ({ messages, view, onSelectMessage, currentUserId, isMobileV
       <div className={`h-full overflow-x-hidden overflow-y-auto divide-y ${isDarkMode ? 'bg-greenblack-light divide-darkblue-dark' : 'bg-oldlace divide-darkblue-light'}`}>
         {view === 'conversations'
           ? Object.entries(groupedMessages)
-              .sort(([, a], [, b]) => new Date(b[0].CREATED) - new Date(a[0].CREATED))
+              .sort(([, a], [, b]) => new Date(b[0]?.CREATED) - new Date(a[0]?.CREATED))
               .map(([key, conversation]) => (
                 <Message
                   key={key}

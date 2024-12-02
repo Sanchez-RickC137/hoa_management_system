@@ -11,6 +11,7 @@ const ChangePasswordModal = ({ user, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // console.log('Modal submit:', { userId: user.id });
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -38,7 +39,7 @@ const ChangePasswordModal = ({ user, onClose, onSuccess }) => {
       <div className={`${isDarkMode ? 'bg-greenblack-light text-tanish-dark' : 'bg-softcoral text-darkblue-light'} p-6 rounded-lg shadow-lg max-w-md w-full m-4 `}>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold mb-6">Change Password</h2>
-          <button onClick={onClose} className="p-2 hover:bg-opacity-80 rounded-full">
+          <button onClick={onClose} data-testid="modal-close-button" className="p-2 hover:bg-opacity-80 rounded-full">
             <X size={24} />
           </button>
         </div>
@@ -48,6 +49,8 @@ const ChangePasswordModal = ({ user, onClose, onSuccess }) => {
             <label className="block mb-2">New Password</label>
             <input
               type="password"
+              id="newPassword"
+              data-testid="new-password-input"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className={inputStyle}
@@ -58,6 +61,8 @@ const ChangePasswordModal = ({ user, onClose, onSuccess }) => {
             <label className="block mb-2">Confirm New Password</label>
             <input
               type="password"
+              id="confirmPassword"
+              data-testid="confirm-password-input"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className={inputStyle}

@@ -31,9 +31,10 @@ const ReplyMessageModal = ({ onClose, onMessageSent, parentMessage }) => {
   const renderStep = () => {
     switch (step) {
       case 1:
+        console.log(parentMessage.MESSAGE_ID);
         return (
           <div className="flex flex-col flex-grow">
-            <div className={`p-4 mb-4 rounded ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
+            <div className={`p-4 mb-4 rounded ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'}`}>
               <p className="font-bold mb-2">Replying to: {parentMessage.FIRST_NAME} {parentMessage.LAST_NAME}</p>
               <p className="whitespace-pre-wrap">{parentMessage.MESSAGE}</p>
               <p className="text-sm mt-2">{new Date(parentMessage.CREATED).toLocaleString()}</p>
@@ -52,11 +53,11 @@ const ReplyMessageModal = ({ onClose, onMessageSent, parentMessage }) => {
           <div className="space-y-4">
             <h3 className="font-bold">Review Your Reply</h3>
             <div className={`p-4 rounded ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
-              <p className="font-bold mb-2">Replying to: {parentMessage.FIRST_NAME} {parentMessage.LAST_NAME}</p>
+              <p className={`font-bold mb-2 ${isDarkMode ? 'text-darkolive' : 'text-darkblue-light'}`}>Replying to: {parentMessage.FIRST_NAME} {parentMessage.LAST_NAME}</p>
               <div className="pl-4 border-l-2 mb-4">
-                <p className="text-sm italic whitespace-pre-wrap">{parentMessage.MESSAGE}</p>
+                <p className={`text-sm italic whitespace-pre-wrap ${isDarkMode ? 'text-darkolive' : 'text-darkblue-light'}`}>{parentMessage.MESSAGE}</p>
               </div>
-              <p className="whitespace-pre-wrap">{message}</p>
+              <p className={`whitespace-pre-wrap ${isDarkMode ? 'text-darkolive' : 'text-darkblue-light'}`}>{message}</p>
             </div>
           </div>
         );

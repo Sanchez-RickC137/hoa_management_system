@@ -40,18 +40,6 @@ const ManageAssessmentsModal = ({ onClose }) => {
     }]);
   };
 
-  const handleRateChange = (index, field, value) => {
-    const updatedRates = [...newRates];
-    if (field === 'isYearlyAssessment') {
-      if (value && !updatedRates[index].year) {
-        setError('Year is required for yearly assessments');
-        return;
-      }
-    }
-    updatedRates[index][field] = value;
-    setNewRates(updatedRates);
-  };
-
   const handleSubmitTypes = async () => {
     try {
       setError(null);
@@ -116,6 +104,46 @@ const ManageAssessmentsModal = ({ onClose }) => {
       console.error('Error adding assessment rates:', err);
     }
   };
+  
+  const handleRateChange = (index, field, value) => {
+    const updatedRates = [...newRates];
+    
+    if (field === 'amount') {
+      // Ensure value is a valid number
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        updatedRates[index].amount = value;
+      }
+    } 
+    else if (field === 'year') {
+      // Always allow empty string for non-yearly assessments
+      if (value === '') {
+        updatedRates[index].year = value;
+        return;
+      }
+      
+      // Now we know it's a string of digits, we can check if it's a valid year
+      const numYear = parseInt(value);
+      if (value.length === 4) {
+        const currentYear = new Date().getFullYear();
+        if (numYear < currentYear) {
+          setError('Year must be ' + currentYear + ' or greater');
+          return;
+        }
+      }
+      updatedRates[index].year = value;
+    }
+    else if (field === 'isYearlyAssessment') {
+      if (value && !updatedRates[index].year) {
+        setError('Year is required for yearly assessments');
+        return;
+      }
+      updatedRates[index][field] = value;
+    } 
+    
+    setNewRates(updatedRates);
+  };
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -199,9 +227,22 @@ const ManageAssessmentsModal = ({ onClose }) => {
                       Amount
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       value={rate.amount}
-                      onChange={(e) => handleRateChange(index, 'amount', e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.match(/^\d*\.?\d{0,2}$/)) {
+                          handleRateChange(index, 'amount', value);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // Prevent negative signs and e (exponential notation)
+                        if (e.key === '-' || e.key === 'e') {
+                          e.preventDefault();
+                        }
+                      }}
+                      min="0.01"
+                      step="0.01"
                       placeholder="0.00"
                       className={`w-full p-2 rounded-lg ${
                         isDarkMode 
@@ -217,7 +258,13 @@ const ManageAssessmentsModal = ({ onClose }) => {
                     <input
                       type="text"
                       value={rate.year}
-                      onChange={(e) => handleRateChange(index, 'year', e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Only allow digits to be typed
+                        if (value === '' || /^\d+$/.test(value)) {
+                          handleRateChange(index, 'year', value);
+                        }
+                      }}
                       placeholder="YYYY"
                       className={`w-full p-2 rounded-lg ${
                         isDarkMode 

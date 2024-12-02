@@ -159,7 +159,7 @@ const PaymentHistoryModal = ({ paymentId , onClose }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <p className="font-bold text-lg mb-2">Payment Information</p>
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-dark'}`}>
                       <p><strong>Payment ID:</strong> #{paymentDetails.paymentId.toString().padStart(6, '0')}</p>
                       <p><strong>Date/Time:</strong> {formatDateTime(paymentDetails.paymentDate)}</p>
                       <p><strong>Amount:</strong> ${parseFloat(paymentDetails.amount).toFixed(2)}</p>
@@ -169,7 +169,7 @@ const PaymentHistoryModal = ({ paymentId , onClose }) => {
 
                   <div>
                     <p className="font-bold text-lg mb-2">Account Details</p>
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
+                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-dark'}`}>
                       <p><strong>Account Number:</strong> {paymentDetails.accountId}</p>
                       {paymentDetails.cardType && (
                         <>

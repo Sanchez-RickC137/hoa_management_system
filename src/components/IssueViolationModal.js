@@ -171,7 +171,7 @@ const ReviewStep = ({ owner, violationData }) => {
 
   return (
     <div className={`p-6 rounded-lg ${
-      isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'
+      isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey'
     }`}>
       <h3 className="text-lg font-bold mb-4">Review Violation Details</h3>
       

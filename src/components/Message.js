@@ -11,7 +11,7 @@ const Message = ({ message, onSelect, currentUserId, isMobileView, isSelected })
       onClick={() => onSelect(message)}
       className={`
         px-3 py-2.5
-        cursor-pointer
+        cursor-pointer mb-2
         ${isDarkMode 
           ? isSelected
             ? 'bg-darkblue-dark bg-opacity-100'

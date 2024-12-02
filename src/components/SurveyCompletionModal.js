@@ -50,7 +50,7 @@ const SurveyCompletionModal = ({ survey, onClose, onSubmit }) => {
 
           <div className="mb-6">
             <p className="text-lg mb-4">{survey.MESSAGE}</p>
-            <div className="space-y-4">
+            <div className={`space-y-4 ${isDarkMode ? 'text-darkolive' : 'text-darkblue-dark'}`}>
               {[survey.ANSWER_1, survey.ANSWER_2, survey.ANSWER_3, survey.ANSWER_4]
                 .map((answer, index) => {
                   if (!answer) return null;

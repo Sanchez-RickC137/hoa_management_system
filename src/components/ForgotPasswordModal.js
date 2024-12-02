@@ -7,10 +7,22 @@ const ForgotPasswordModal = ({ onClose }) => {
   const { isDarkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ type: '', message: '' });
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email');
+      return;
+    }
+
     if (!email.trim()) return;
 
     try {
@@ -52,13 +64,14 @@ const ForgotPasswordModal = ({ onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" data-testid="forgot-password-form">
           {/* Email Input */}
           <div>
-            <label className="block mb-2">Email Address</label>
+            <label htmlFor="forgot-email" className="block mb-2">Email Address</label>
             <div className="relative">
               <input
                 type="email"
+                id="forgot-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`w-full p-3 pl-10 rounded-lg ${

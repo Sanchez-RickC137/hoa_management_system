@@ -66,15 +66,38 @@ const Documents = () => {
   };
 
   const DocumentModal = ({ document, onClose }) => {
-    const handleDownload = () => {
-      // Logic to handle document download
-      const fileUrl = `data:${document.FILE_MIME};base64,${document.FILE_BLOB}`;
-      const link = document.createElement('a');
-      link.href = fileUrl;
-      link.download = document.FILE_NAME;
-      link.click();
+    const [downloading, setDownloading] = useState(false);
+  
+    const handleDownload = async () => {
+      try {
+        setDownloading(true);
+        
+        const blobData = await apiService.downloadDocument(document.DOCUMENT_ID);
+        
+        // Create a blob URL directly from the blob data
+        const blobUrl = window.URL.createObjectURL(new Blob([blobData]));
+        
+        // Create a temporary link element and trigger the download
+        const a = window.document.createElement('a');
+        a.href = blobUrl;
+        a.download = document.FILE_NAME || 'download'; // Fallback filename if none provided
+        
+        // Programmatically click the link to trigger download
+        window.document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        window.document.body.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+        
+        setDownloading(false);
+      } catch (error) {
+        console.error('Error in handleDownload:', error);
+        setDownloading(false);
+        window.alert('Failed to download document. Please try again.');
+      }
     };
-
+  
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className={`relative w-full max-w-2xl mx-4 rounded-lg shadow-lg ${
@@ -91,18 +114,21 @@ const Documents = () => {
             <p className="mb-2">{document.DESCRIPTION}</p>
             <p className="text-sm">Uploaded on: {new Date(document.CREATED).toLocaleDateString()}</p>
           </div>
-
+  
           <div className="flex justify-between items-center">
-            <p className={`text-sm ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>File: {document.FILE_NAME}</p>
+            <p className={`text-sm ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
+              File: {document.FILE_NAME}
+            </p>
             <button
               onClick={handleDownload}
+              disabled={downloading}
               className={`px-4 py-2 rounded-lg ${
                 isDarkMode 
                   ? 'bg-darkblue-dark hover:bg-darkblue-light text-tanish-dark' 
                   : 'bg-greenblack-light hover:bg-darkblue-light text-tanish-light'
-              }`}
+              } ${downloading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Download
+              {downloading ? 'Downloading...' : 'Download'}
             </button>
           </div>
         </div>

@@ -48,19 +48,19 @@ const ChargeDetailsModal = ({ chargeId, onClose }) => {
         {chargeDetails && (
           <div className="space-y-4">
             <p><strong>Account ID:</strong> {chargeDetails.accountId}</p>
-            <p><strong>Date:</strong> {formatDate(chargeDetails.assessDate)}</p>
-            <p><strong>Amount:</strong> ${parseFloat(chargeDetails.amount).toFixed(2)}</p>
-            <p><strong>Charge ID:</strong> {chargeDetails.chargeId}</p>
-            {chargeDetails.violationDescription && (
-              <p><strong>Violation Description:</strong> {chargeDetails.violationDescription}</p>
+            {chargeDetails.assessDate && (
+              <p><strong>Assessment Date:</strong> {formatDate(chargeDetails.assessDate)}</p>
             )}
             {chargeDetails.assessmentDescription && (
               <p><strong>Assessment Description:</strong> {chargeDetails.assessmentDescription}</p>
             )}
-            <p><strong>Due Date:</strong> {formatDate(chargeDetails.paymentDueDate)}</p>
-            {chargeDetails.violationDate && (
-              <p><strong>Violation Date:</strong> {formatDate(chargeDetails.violationDate)}</p>
+            {chargeDetails.violationDescription && (
+              <p><strong>Violation Description:</strong> {chargeDetails.violationDescription}</p>
             )}
+            <p><strong>Amount:</strong> ${parseFloat(chargeDetails.amount).toFixed(2)}</p>
+            <p><strong>Charge ID:</strong> {chargeDetails.chargeId}</p>
+            <p><strong>Due Date:</strong> {formatDate(chargeDetails.paymentDueDate)}</p>
+            
             <p><strong>Issued By:</strong> {chargeDetails.issuerName}</p>
           </div>
         )}

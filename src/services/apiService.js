@@ -197,6 +197,7 @@ class ApiService {
 
   // Password & Security
   async changePassword(userId, newPassword) {
+    // console.log('apiService changePassword called:', { userId, newPassword });
     try {
       this.logApiCall('POST', '/change-password', { userId });
       const response = await axiosPrivate.post('/change-password', { userId, newPassword });

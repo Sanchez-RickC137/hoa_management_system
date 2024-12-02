@@ -1,4 +1,3 @@
-// src/services/authService.js
 import { axiosPublic } from './axiosConfig';
 
 class AuthService {
@@ -31,7 +30,8 @@ class AuthService {
 
   async register(userData) {
     try {
-      return await axiosPublic.post('/register', userData);
+      const response = await axiosPublic.post('/register', userData);
+      return response.data;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -58,11 +58,12 @@ class AuthService {
 
   async verifyRegistration(accountId, ownerId, tempCode) {
     try {
-      return await axiosPublic.post('/verify-registration', { 
-        accountId, 
-        ownerId, 
-        tempCode 
+      const response = await axiosPublic.post('/verify-registration', {
+        accountId,
+        ownerId,
+        tempCode
       });
+      return response.data; // Return just the data portion 
     } catch (error) {
       console.error('Verify registration error:', error);
       throw error;

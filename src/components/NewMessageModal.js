@@ -93,7 +93,7 @@ const NewMessageModal = ({ onClose, onMessageSent }) => {
                           ? 'bg-darkblue-dark text-tanish-dark'
                           : 'bg-greenblack-light text-tanish-light'
                         : isDarkMode
-                          ? 'bg-mutedolive hover:bg-darkblue-dark'
+                          ? 'bg-mutedolive text-darkolive hover:bg-darkblue-dark'
                           : 'bg-palebluegrey hover:bg-greenblack-light hover:text-tanish-light'
                     }`}
                   >
@@ -130,8 +130,8 @@ const NewMessageModal = ({ onClose, onMessageSent }) => {
           <div className="space-y-4">
             <h3 className="font-bold">Review Your Message</h3>
             <div className={`p-4 rounded ${isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'}`}>
-              <p className="font-bold mb-2">To: {selectedRecipient.FIRST_NAME} {selectedRecipient.LAST_NAME}</p>
-              <p className="whitespace-pre-wrap">{message}</p>
+              <p className={`font-bold mb-2 ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'}`}>To: {selectedRecipient.FIRST_NAME} {selectedRecipient.LAST_NAME}</p>
+              <p className={`whitespace-pre-wrap ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'}`}>{message}</p>
             </div>
           </div>
         );

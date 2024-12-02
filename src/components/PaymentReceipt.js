@@ -43,7 +43,7 @@ const PaymentReceipt = ({ payment, printMode = false }) => {
       <div className="flex justify-between items-start mb-8">
         <div>
           <img 
-            src={printMode ? LogoLight : (isDarkMode ? LogoDark : LogoLight)} 
+            src={printMode ? LogoLight : (isDarkMode ? LogoLight : LogoDark)} 
             alt="Summit Ridge Logo" 
             className="h-16 mb-4"
           />
@@ -82,7 +82,7 @@ const PaymentReceipt = ({ payment, printMode = false }) => {
       {/* Payment Details */}
       <div className={`mb-8 ${printMode ? 'text-black' : ''}`}>
         <div className={`grid grid-cols-1 gap-4 p-4 rounded-lg ${
-          printMode ? 'border' : isDarkMode ? 'bg-mutedolive' : 'bg-palebluegrey'
+          printMode ? 'border' : isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-dark'
         }`}>
           <div className="grid grid-cols-2 gap-4 border-b pb-2">
             <p className="font-bold">Description</p>

@@ -31,7 +31,7 @@ const AnnouncementModal = ({ announcement, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col ${
+      <div className={`relative w-full max-w-2xl max-h-[90vh] mt-16 md:mt-0 overflow-hidden transform sm:translate-y-16 lg:translate-y-0 flex flex-col ${
         isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
       } rounded-lg shadow-lg`}>
         {/* Header */}

@@ -25,27 +25,21 @@ const MessageDetail = ({ message, thread, onClose, onReply, currentUserId, isMob
 
   const renderMessageTree = (msg, level = 0) => (
     <div key={msg.MESSAGE_ID} className="relative">
-      <div 
-        className={`mb-3 ${level > 0 ? 'ml-6' : ''}`}
-        style={{
-          borderLeft: level > 0 ? `2px solid ${isDarkMode ? '#354856' : '#D6C6B0'}` : 'none',
-        }}
-      >
+      <div className={`mb-3 ${level > 0 ? 'ml-6' : ''}`}>
         {level > 0 && (
-          <div className="absolute -left-[1px] top-4 -ml-3">
+          <div className="absolute -left-[1px] top-4 ml-[3px]">
             <CornerDownRight size={16} className={isDarkMode ? 'text-darkblue-light' : 'text-tanish-dark'} />
           </div>
         )}
-        
         <div className={`rounded-lg shadow-lg overflow-hidden ${
-          isDarkMode 
-            ? msg.SENDER_ID === currentUserId 
-              ? 'bg-darkblue-dark bg-opacity-40' 
-              : 'bg-greenblack-light bg-opacity-40'
-            : msg.SENDER_ID === currentUserId 
-              ? 'bg-lightgray bg-opacity-40' 
-              : 'bg-mutedbeige bg-opacity-40'
-        }`}>
+            isDarkMode 
+              ? msg.SENDER_ID === currentUserId 
+                ? 'bg-darkblue-dark bg-opacity-40' 
+                : 'bg-greenblack-light bg-opacity-40'
+              : msg.SENDER_ID === currentUserId 
+                ? 'bg-lightgray bg-opacity-60' 
+                : 'bg-oldlace bg-opacity-100'
+          }`}>
           <div className="p-3">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -95,7 +89,7 @@ const MessageDetail = ({ message, thread, onClose, onReply, currentUserId, isMob
           </div>
         </div>
       </div>
-      <div className="pl-6">
+      <div className={`${level > 0 ? 'ml-4' : 'ml-0'}`}>
         {msg.children.map(child => renderMessageTree(child, level + 1))}
       </div>
     </div>

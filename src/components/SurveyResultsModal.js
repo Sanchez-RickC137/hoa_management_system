@@ -80,11 +80,11 @@ const SurveyResultsModal = ({ survey, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`w-full max-w-3xl mx-4 rounded-lg shadow-lg ${
         isDarkMode ? 'bg-greenblack-light text-tanish-dark' : 'bg-softcoral text-darkblue-light'
-      }`}>
+      } mt-16 lg:mt-0 overflow-y-auto max-h-[80vh]`}>
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Survey Results</h2>
-            <button onClick={onClose} className="p-2 hover:bg-opacity-80 rounded-full">
+            <button onClick={onClose}>
               <X size={24} />
             </button>
           </div>

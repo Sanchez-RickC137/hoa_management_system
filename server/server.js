@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const apiRoutes = require('./routes/apiRoutes');
 const { scheduleJob } = require('node-schedule');
 const { processSurveyResults } = require('./utils/surveyUtils');
+const helmet = require('helmet');
 
 const app = express();
 app.use(cors());
@@ -443,7 +444,16 @@ scheduleJob('0 9 * * 1', async () => {
   }
 });
 
-
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+}));
 
 
 app.use('/api', apiRoutes);

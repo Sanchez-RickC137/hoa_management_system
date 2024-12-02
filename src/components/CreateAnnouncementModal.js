@@ -169,24 +169,18 @@ const CreateAnnouncementModal = ({ onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className={`relative w-full max-w-2xl mx-4 rounded-lg shadow-lg ${
         isDarkMode ? 'bg-greenblack-light' : 'bg-softcoral'
-      }`}>
-        <div className="flex justify-between items-center p-6 border-b border-opacity-20">
-          <h2 className={`text-2xl font-bold ${
-            isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'
-          }`}>
+      } max-h-[calc(100vh-80px)] mt-16 md:mt-0 overflow-hidden flex flex-col`}>
+        {/* Header */}
+        <div className="flex justify-between items-center p-4 md:p-6 border-b border-opacity-20 sticky top-0 bg-inherit z-10">
+          <h2 className={`text-xl md:text-2xl font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
             Create New Announcement
           </h2>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-full hover:bg-opacity-80 ${
-              isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'
-            }`}
-          >
+          <button onClick={onClose} className={`p-2 rounded-full hover:bg-opacity-80`}>
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className={`block mb-2 ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>Type</label>

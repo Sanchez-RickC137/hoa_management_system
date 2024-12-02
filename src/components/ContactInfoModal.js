@@ -1,7 +1,7 @@
-// src/components/ContactInfoModal.js
 import React, { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { X } from 'lucide-react';
+import { formatPhoneNumber, validatePhone, validateEmail } from '../utils/validation';
 
 const ContactInfoModal = ({ data, onClose, onSave }) => {
   const { isDarkMode } = useTheme();
@@ -9,9 +9,36 @@ const ContactInfoModal = ({ data, onClose, onSave }) => {
     EMAIL: data?.EMAIL || '',
     PHONE: data?.PHONE || ''
   });
+  const [errors, setErrors] = useState({});
+
+  const handlePhoneChange = (e) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData(prev => ({ ...prev, PHONE: formatted }));
+    setErrors(prev => ({ ...prev, PHONE: !validatePhone(formatted) ? 'Phone must be 10 digits' : '' }));
+  };
+
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setFormData(prev => ({ ...prev, EMAIL: email }));
+    setErrors(prev => ({ ...prev, EMAIL: !validateEmail(email) ? 'Invalid email format' : '' }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate all fields
+    const newErrors = {
+      EMAIL: !validateEmail(formData.EMAIL) ? 'Invalid email format' : '',
+      PHONE: !validatePhone(formData.PHONE) ? 'Phone must be 10 digits' : ''
+    };
+
+    setErrors(newErrors);
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some(error => error)) {
+      return;
+    }
+
     try {
       await onSave(formData);
       onClose();
@@ -40,10 +67,11 @@ const ContactInfoModal = ({ data, onClose, onSave }) => {
             <input
               type="email"
               value={formData.EMAIL}
-              onChange={(e) => setFormData(prev => ({ ...prev, EMAIL: e.target.value }))}
-              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'}`}
+              onChange={handleEmailChange}
+              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'} ${errors.EMAIL ? 'border-red-500' : ''}`}
               required
             />
+            {errors.EMAIL && <p className="text-red-500 text-sm mt-1">{errors.EMAIL}</p>}
           </div>
 
           <div>
@@ -53,10 +81,12 @@ const ContactInfoModal = ({ data, onClose, onSave }) => {
             <input
               type="tel"
               value={formData.PHONE}
-              onChange={(e) => setFormData(prev => ({ ...prev, PHONE: e.target.value }))}
-              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'}`}
+              onChange={handlePhoneChange}
+              placeholder="(XXX) XXX-XXXX"
+              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-mutedolive text-darkolive' : 'bg-palebluegrey text-darkblue-light'} ${errors.PHONE ? 'border-red-500' : ''}`}
               required
             />
+            {errors.PHONE && <p className="text-red-500 text-sm mt-1">{errors.PHONE}</p>}
           </div>
 
           <div className="flex justify-end space-x-4 mt-6">

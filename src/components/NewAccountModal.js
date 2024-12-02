@@ -193,7 +193,10 @@ const NewAccountModal = ({ onClose, onSuccess }) => {
           )}
           {step === 2 && (
             <button
-              onClick={onSuccess}
+              onClick={() => {
+                onSuccess();
+                onClose();
+              }}
               className={`px-4 py-2 rounded-lg ${
                 isDarkMode 
                   ? 'bg-darkblue-dark hover:bg-darkblue-light text-tanish-dark' 

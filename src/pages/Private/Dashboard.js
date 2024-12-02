@@ -75,22 +75,22 @@ const UpdateItem = ({ item }) => {
 const RecentUpdates = ({ updates }) => {
   const { isDarkMode } = useTheme();
 
-  // Get only the last 3 updates
-  const latestUpdates = updates.slice(0, 3);
-
   return (
-    <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'}`}>
-      <h5 className={`mb-4 text-2xl text-center font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'}`}>
+    <div className={`${isDarkMode ? 'bg-greenblack-light' : 'bg-oldlace'} p-6 rounded-lg h-[43rem]`}>
+      <h5 className={`text-2xl text-center font-bold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-4`}>
         Recent Updates
       </h5>
-      <div className="space-y-4">
-        {latestUpdates.map((item, index) => (
-          <UpdateItem key={index} item={item} />
-        ))}
+      <div className="h-[38rem] overflow-y-auto">
+        <div className="space-y-4 pr-2">
+          {updates.map((item, index) => (
+            <UpdateItem key={index} item={item} />
+          ))}
+        </div>
       </div>
     </div>
   );
 };
+
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);

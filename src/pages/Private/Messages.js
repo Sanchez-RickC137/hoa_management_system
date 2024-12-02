@@ -76,6 +76,8 @@ const Messages = () => {
 
   const handleReply = (parentMessageId) => {
     if (selectedMessage?.SENDER_ID !== 999999999) {
+      const parentMessage = messages.find(msg => msg.MESSAGE_ID === parentMessageId);
+      setSelectedMessage(parentMessage);
       setShowReplyModal(true);
     }
   };
@@ -89,8 +91,10 @@ const Messages = () => {
     return (
       <div className={`flex justify-center align-center ${isDarkMode ? 'bg-greenblack-dark' : 'bg-tanish-light'} min-h-screen`}>
         <Sidebar />
+        <div className="flex-1 flex items-center justify-center">
         {isDarkMode && <FourSquare color='#D6C6B0' size="large" text="Loading" textColor="" />}
         {!isDarkMode && <FourSquare color='#2A3A4A' size="large" text="Loading" textColor="" />}
+        </div>
       </div>
     );
   }
@@ -100,7 +104,7 @@ const Messages = () => {
     <div className="flex flex-col h-screen pt-14 max-w-[1400px] mx-auto">
       {/* Desktop Header */}
       <div className="flex items-center justify-between px-6 h-14 border-b bg-inherit">
-        <h1 className="text-xl font-bold">Messages</h1>
+        <h1 className="text-3xl font-bold">Messages</h1>
         <div className="flex gap-4">
           <div className="flex rounded-lg shadow-lg overflow-hidden border border-darkblue-dark">
             <button
@@ -135,7 +139,7 @@ const Messages = () => {
 
       {/* Desktop Content */}
       <div className="flex flex-1 min-h-0">
-        <div className="w-80 border-r border-darkblue-dark">
+        <div className="w-80 border border-darkblue-dark">
           <MessageList
             messages={messages}
             view={view}
@@ -242,7 +246,7 @@ const Messages = () => {
             )}
           </div>
         ) : (
-          <div className="h-full">
+          <div className="h-full border border-darkblue-dark">
             <MessageList
               messages={messages}
               view={view}

@@ -274,7 +274,7 @@ router.get('/cards/:accountId', verifyToken, async (req, res) => {
     console.log('Fetching cards for account:', accountId);
 
     const [cards] = await pool.query(
-      'SELECT CARD_ID, CARD_TYPE, CARD_NUMBER_LAST_4, EXPIRY_MONTH, EXPIRY_YEAR, IS_DEFAULT FROM CREDIT_CARDS WHERE ACCOUNT_ID = ?',
+      'SELECT CARD_ID, CARD_TYPE, CARD_NUMBER_LAST_4, EXPIRY_MONTH, EXPIRY_YEAR, IS_DEFAULT FROM CREDIT_CARDS WHERE ACCOUNT_ID = ? AND IS_ACTIVE = 1',
       [accountId]
     );
 
@@ -291,7 +291,6 @@ router.post('/cards/:accountId', verifyToken, async (req, res) => {
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
-
     const { cardNumber, expiryMonth, expiryYear, cardType, nickname } = req.body;
     const accountId = req.params.accountId;
     
@@ -300,26 +299,76 @@ router.post('/cards/:accountId', verifyToken, async (req, res) => {
     // Create a hash of the card number
     const cardNumberHash = crypto.createHash('sha256').update(cardNumber).digest('hex');
 
-    // Check if this is the first card for the account
-    const [existingCards] = await connection.query(
-      'SELECT COUNT(*) as cardCount FROM CREDIT_CARDS WHERE ACCOUNT_ID = ?',
-      [accountId]
+    // Check if card exists for this account
+    const [existingCard] = await connection.query(
+      'SELECT CARD_ID, IS_ACTIVE FROM CREDIT_CARDS WHERE ACCOUNT_ID = ? AND CARD_NUMBER_HASH = ?',
+      [accountId, cardNumberHash]
     );
 
+    if (existingCard.length > 0) {
+      // Card exists - check if it's inactive
+      if (!existingCard[0].IS_ACTIVE) {
+        // Update and reactivate the existing card
+        await connection.query(
+          `UPDATE CREDIT_CARDS 
+           SET EXPIRY_MONTH = ?, 
+               EXPIRY_YEAR = ?, 
+               CARD_TYPE = ?,
+               CARD_NICKNAME = ?,
+               IS_ACTIVE = 1,
+               UPDATED_AT = CURRENT_TIMESTAMP
+           WHERE CARD_ID = ?`,
+          [expiryMonth, expiryYear, cardType, nickname, existingCard[0].CARD_ID]
+        );
+        await connection.commit();
+        res.json({ 
+          message: 'Card reactivated successfully', 
+          cardId: existingCard[0].CARD_ID 
+        });
+        return;
+      } else {
+        // Card is already active
+        await connection.rollback();
+        res.status(400).json({ 
+          error: 'This card is already registered to this account' 
+        });
+        return;
+      }
+    }
+
+    // Check if this is the first active card for the account
+    const [existingCards] = await connection.query(
+      'SELECT COUNT(*) as cardCount FROM CREDIT_CARDS WHERE ACCOUNT_ID = ? AND IS_ACTIVE = 1',
+      [accountId]
+    );
     const isDefault = existingCards[0].cardCount === 0 ? 1 : 0;
 
     // Insert the new card
     const [result] = await connection.query(
-      'INSERT INTO CREDIT_CARDS (ACCOUNT_ID, CARD_NUMBER_LAST_4, CARD_NUMBER_HASH, EXPIRY_MONTH, EXPIRY_YEAR, CARD_TYPE, CARD_NICKNAME, IS_DEFAULT) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      `INSERT INTO CREDIT_CARDS (
+        ACCOUNT_ID, 
+        CARD_NUMBER_LAST_4, 
+        CARD_NUMBER_HASH, 
+        EXPIRY_MONTH, 
+        EXPIRY_YEAR, 
+        CARD_TYPE, 
+        CARD_NICKNAME, 
+        IS_DEFAULT
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [accountId, last4, cardNumberHash, expiryMonth, expiryYear, cardType, nickname, isDefault]
     );
 
     await connection.commit();
-    res.status(201).json({ message: 'Card added successfully', cardId: result.insertId });
+    res.status(201).json({ 
+      message: 'Card added successfully', 
+      cardId: result.insertId 
+    });
   } catch (error) {
     await connection.rollback();
     console.error('Error adding card:', error);
-    res.status(500).json({ error: 'An error occurred while adding the card' });
+    res.status(500).json({ 
+      error: 'An error occurred while adding the card' 
+    });
   } finally {
     connection.release();
   }
@@ -372,10 +421,9 @@ router.put('/cards/:cardId/default', verifyToken, async (req, res) => {
 router.delete('/cards/:cardId', verifyToken, async (req, res) => {
   try {
     const cardId = req.params.cardId;
-    
-    await pool.query('DELETE FROM CREDIT_CARDS WHERE CARD_ID = ?', [cardId]);
-
-    res.json({ message: 'Card deleted successfully' });
+    const query = "UPDATE CREDIT_CARDS SET IS_ACTIVE = 0, IS_DEFAULT = 0 WHERE CARD_ID = ?";
+    await pool.query(query, [cardId]);
+    res.json({ message: 'Card successfully removed' });
   } catch (error) {
     console.error('Error deleting card:', error);
     res.status(500).json({ error: 'An error occurred while deleting the card' });
@@ -804,36 +852,68 @@ router.post('/verify-registration', async (req, res) => {
   try {
     const { accountId, ownerId, tempCode } = req.body;
     
+    console.log('Received registration verification request:', {
+      accountId,
+      ownerId,
+      tempCodeLength: tempCode ? tempCode.length : 0
+    });
+
+    // Input validation
     if (!accountId || !ownerId || !tempCode) {
+      console.log('Missing required fields:', { accountId, ownerId, tempCodePresent: !!tempCode });
       return res.status(400).json({ valid: false, error: 'Missing required fields' });
     }
 
-    const [owner] = await pool.query('SELECT * FROM OWNER WHERE OWNER_ID = ?', [ownerId]);
+    // Query owner
+    const [owner] = await pool.query(
+      'SELECT OWNER_ID, PASSWORD_HASH, IS_TEMPORARY_PASSWORD FROM OWNER WHERE OWNER_ID = ?', 
+      [ownerId]
+    );
     
+    console.log('Owner query result:', {
+      found: owner.length > 0,
+      isTemp: owner.length > 0 ? owner[0].IS_TEMPORARY_PASSWORD : null
+    });
+
     if (owner.length === 0) {
-      return res.status(400).json({ valid: false, error: 'Invalid owner information' });
+      return res.status(400).json({ valid: false, error: 'Owner ID not found' });
     }
 
-    const isValidTempCode = await bcrypt.compare(tempCode, owner[0].PASSWORD_HASH);
+    // Verify account association
+    const [account] = await pool.query(
+      'SELECT ACCOUNT_ID FROM ACCOUNT WHERE ACCOUNT_ID = ? AND OWNER_ID = ?', 
+      [accountId, ownerId]
+    );
     
-    if (!isValidTempCode) {
-      return res.status(400).json({ valid: false, error: 'Invalid temporary code' });
-    }
+    console.log('Account query result:', { found: account.length > 0 });
 
-    const [account] = await pool.query('SELECT * FROM ACCOUNT WHERE ACCOUNT_ID = ? AND OWNER_ID = ?', [accountId, ownerId]);
-    
     if (account.length === 0) {
-      return res.status(400).json({ valid: false, error: 'Invalid account information' });
+      return res.status(400).json({ valid: false, error: 'Account not associated with this owner' });
     }
 
+    // Check temporary password status
     if (!owner[0].IS_TEMPORARY_PASSWORD) {
       return res.status(400).json({ valid: false, error: 'Account is already registered' });
     }
 
+    // Verify temporary code
+    const isValidTempCode = await bcrypt.compare(tempCode, owner[0].PASSWORD_HASH);
+    console.log('Temporary code verification:', { isValid: isValidTempCode });
+
+    if (!isValidTempCode) {
+      return res.status(400).json({ valid: false, error: 'Invalid temporary code' });
+    }
+
+    // Success
     res.json({ valid: true, accountId, ownerId });
+
   } catch (error) {
-    console.error('Server: Registration verification error', error);
-    res.status(500).json({ valid: false, error: 'An error occurred during registration verification' });
+    console.error('Registration verification error:', error);
+    res.status(500).json({ 
+      valid: false, 
+      error: 'An error occurred during registration verification',
+      details: error.message
+    });
   }
 });
 
@@ -858,6 +938,7 @@ router.post('/register', async (req, res) => {
 
 // Password Update Route
 router.post('/change-password', verifyToken, async (req, res) => {
+  // console.log('Route handler:', req.body);
   try {
     const { userId, newPassword } = req.body;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
@@ -2858,6 +2939,66 @@ router.put('/board-members/map/:ownerId/:boardMemberId/end', verifyToken, verify
 
 
 // Add new board member
+// router.post('/board-members', verifyToken, verifyBoardMember, async (req, res) => {
+//   const connection = await pool.getConnection();
+//   try {
+//     await connection.beginTransaction();
+    
+//     const { ownerId, roleId } = req.body;
+    
+//     // Check not adding admin role
+//     if (roleId === 1) {
+//       throw new Error('Cannot assign administrator role');
+//     }
+
+//     // Verify owner is active
+//     const [ownerRows] = await connection.query(`
+//       SELECT o.* 
+//       FROM OWNER o
+//       JOIN PROPERTY_OWNER_MAP pom ON o.OWNER_ID = pom.OWNER_ID
+//       WHERE o.OWNER_ID = ?
+//         AND pom.PURCHASE_DATE <= CURRENT_DATE 
+//         AND (pom.SELL_DATE IS NULL OR pom.SELL_DATE > CURRENT_DATE)
+//     `, [ownerId]);
+
+//     if (ownerRows.length === 0) {
+//       throw new Error('Invalid or inactive owner');
+//     }
+
+//     // Check if owner already has an active role
+//     const [existingRole] = await connection.query(`
+//       SELECT * FROM OWNER_BOARD_MEMBER_MAP
+//       WHERE OWNER_ID = ?
+//         AND START_DATE <= CURRENT_DATE
+//         AND (END_DATE IS NULL OR END_DATE >= CURRENT_DATE)
+//     `, [ownerId]);
+
+//     console.log(existingRole);
+
+//     if (existingRole.length > 0) {
+//       throw new Error('Owner already has an active board member role');
+//     }
+
+//     // Add new board member role
+//     await connection.query(`
+//       INSERT INTO OWNER_BOARD_MEMBER_MAP (
+//         OWNER_ID,
+//         BOARD_MEMBER_ID,
+//         START_DATE
+//       ) VALUES (?, ?, CURRENT_DATE)
+//     `, [ownerId, roleId]);
+
+//     await connection.commit();
+//     res.status(201).json({ message: 'Board member added successfully' });
+//   } catch (error) {
+//     await connection.rollback();
+//     console.error('Error adding board member:', error);
+//     res.status(500).json({ error: error.message || 'Failed to add board member' });
+//   } finally {
+//     connection.release();
+//   }
+// });
+
 router.post('/board-members', verifyToken, verifyBoardMember, async (req, res) => {
   const connection = await pool.getConnection();
   try {
@@ -2865,7 +3006,7 @@ router.post('/board-members', verifyToken, verifyBoardMember, async (req, res) =
     
     const { ownerId, roleId } = req.body;
     
-    // Check not adding admin role
+    // Prevent assigning administrator role
     if (roleId === 1) {
       throw new Error('Cannot assign administrator role');
     }
@@ -2884,26 +3025,44 @@ router.post('/board-members', verifyToken, verifyBoardMember, async (req, res) =
       throw new Error('Invalid or inactive owner');
     }
 
-    // Check if owner already has an active role
+    // Check if owner already has an active role with the same roleId
     const [existingRole] = await connection.query(`
       SELECT * FROM OWNER_BOARD_MEMBER_MAP
       WHERE OWNER_ID = ?
+        AND BOARD_MEMBER_ID = ?
         AND START_DATE <= CURRENT_DATE
         AND (END_DATE IS NULL OR END_DATE >= CURRENT_DATE)
-    `, [ownerId]);
+    `, [ownerId, roleId]);
 
     if (existingRole.length > 0) {
-      throw new Error('Owner already has an active board member role');
-    }
+      // If same roleId exists, update start_date and clear end_date
+      await connection.query(`
+        UPDATE OWNER_BOARD_MEMBER_MAP
+        SET START_DATE = CURRENT_DATE, END_DATE = NULL
+        WHERE OWNER_ID = ? AND BOARD_MEMBER_ID = ?
+      `, [ownerId, roleId]);
+    } else {
+      // Check if owner has any active role regardless of roleId
+      const [activeRole] = await connection.query(`
+        SELECT * FROM OWNER_BOARD_MEMBER_MAP
+        WHERE OWNER_ID = ?
+          AND START_DATE <= CURRENT_DATE
+          AND (END_DATE IS NULL OR END_DATE > CURRENT_DATE)
+      `, [ownerId]);
 
-    // Add new board member role
-    await connection.query(`
-      INSERT INTO OWNER_BOARD_MEMBER_MAP (
-        OWNER_ID,
-        BOARD_MEMBER_ID,
-        START_DATE
-      ) VALUES (?, ?, CURRENT_DATE)
-    `, [ownerId, roleId]);
+      if (activeRole.length > 0) {
+        throw new Error('Owner already has an active board member role');
+      }
+
+      // Insert new role if no active role exists
+      await connection.query(`
+        INSERT INTO OWNER_BOARD_MEMBER_MAP (
+          OWNER_ID,
+          BOARD_MEMBER_ID,
+          START_DATE
+        ) VALUES (?, ?, CURRENT_DATE)
+      `, [ownerId, roleId]);
+    }
 
     await connection.commit();
     res.status(201).json({ message: 'Board member added successfully' });
@@ -2915,6 +3074,7 @@ router.post('/board-members', verifyToken, verifyBoardMember, async (req, res) =
     connection.release();
   }
 });
+
 
 // Get available properties
 router.get('/properties/available', verifyToken, verifyBoardMember, async (req, res) => {

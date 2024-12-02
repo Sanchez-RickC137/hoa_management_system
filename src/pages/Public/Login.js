@@ -28,31 +28,55 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      const result = await authService.login(email, password);
-      if (result.token) {
-        localStorage.setItem('token', result.token);
-        if (result.isTemporaryPassword) {
-          setTempLoginData(result.user);
+      const { user, success, isTemporaryPassword, error } = await login(email, password);
+      if (success) {
+        if (isTemporaryPassword) {
+          setTempLoginData(user);
           setShowChangePasswordModal(true);
         } else {
-          setTimeout(() => {
-            navigate('/dashboard');
-          }, 0);
+          navigate('/dashboard', { replace: true });
         }
       } else {
-        setError(result.error || 'Login failed');
+        setError(error || 'Invalid credentials'); 
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('An unexpected error occurred');
+      setError(err.response?.data?.error || "An error occurred during login. Please try again.");
     }
   };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError('');
+  //   try {
+  //     const result = await authService.login(email, password);
+  //     console.log('Login result:', result);
+      
+  //     if (result.token) {
+  //       localStorage.setItem('token', result.token);
+  //       if (result.isTemporaryPassword) {
+  //         setTempLoginData(result.user);
+  //         setShowChangePasswordModal(true);
+  //       } else {
+  //         console.log('Login successful, navigating to dashboard');
+  //         setTimeout(() => {
+  //           navigate('/dashboard');
+  //         }, 0);
+  //       }
+  //     } else {
+  //       setError(result.error || 'Login failed');
+  //     }
+  //   } catch (err) {
+  //     console.error('Login error:', err);
+  //     setError('An unexpected error occurred');
+  //   }
+  // };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       const result = await authService.verifyRegistration(regAccount, regOwner, regCode);
+      console.log('Registration verification result:', result);
       if (result.valid) {
         setShowRegistrationModal(true);
       } else {
@@ -63,6 +87,19 @@ const Login = () => {
       setError('An error occurred during registration verification');
     }
   };
+
+  const handleRegistrationSuccess = () => {
+    setShowRegistrationModal(false);
+    setIsLoginView(!isLoginView);
+    // Clear registration fields
+    setRegAccount('');
+    setRegOwner('');
+    setRegCode('');
+    // Clear login fields
+    setEmail('');
+    setPassword('');
+  };
+
 
   const toggleView = () => {
     setIsLoginView(!isLoginView);
@@ -103,6 +140,7 @@ const Login = () => {
               <h2 className="text-4xl font-bold mb-6">Join Summit Ridge HOA</h2>
               <p className="text-lg mb-6">Register to become a part of our community.</p>
               <button onClick={toggleView} 
+                      data-testid="login-toggle"
                       className={`px-4 py-2 rounded ${isDarkMode ? 'bg-darkblue-dark hover:bg-darkblue-light text-tanish-dark' : 'bg-greenblack-light hover:bg-darkblue-light text-tanish-light'}`}>
                 Already have an account?
               </button>
@@ -154,26 +192,40 @@ const Login = () => {
               <h2 className="text-4xl font-bold mb-6">Welcome to Summit Ridge HOA</h2>
               <p className="text-lg mb-6">Log in to access your account and community information.</p>
               <button onClick={toggleView} 
+                      data-testid="register-toggle"
                       className={`px-4 py-2 rounded ${isDarkMode ? 'bg-darkblue-dark hover:bg-darkblue-light text-tanish-dark' : 'bg-greenblack-light hover:bg-darkblue-light text-tanish-light'}`}>
                 Need to Register?
               </button>
               <div className="mt-4">
-                <p>Ada.Nolcrest@coldmail.com</p>
-                <p>Pas$w0rd1!</p>
+                {/* <p>Ada.Nolcrest@coldmail.com</p> */}
+                {/* <p>Pas$w0rd1!</p> */}
               </div>
             </div>
             <div className="w-1/4 p-12">
               <h2 className={`text-3xl font-extrabold ${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} mb-6`}>
                 Login
               </h2>
-              {error && <p className="text-red-500 mb-4">{error}</p>}
-              <form className="space-y-6" onSubmit={handleSubmit}>
+              {error && <p className="text-red-500 mb-4" data-testid="desktop-error-message">{error}</p>}
+              <form 
+                className="space-y-6" 
+                data-testid="login-form"
+                onSubmit={handleSubmit}>
                 <div>
                   <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Email Address</label>
                   <input
                     type="email"
+                    id="email"
+                    name="email"
+                    aria-label="Email Address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={(e) => {
+                      if (!e.target.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                        setError('Invalid email format');
+                      } else {
+                        setError('');
+                      }
+                    }}
                     className={inputStyle}
                     required
                   />
@@ -182,8 +234,18 @@ const Login = () => {
                   <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Password</label>
                   <input
                     type="password"
+                    id="password"
+                    name="password"
+                    aria-label="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onBlur={(e) => {
+                      if (e.target.value.length < 8) {
+                        setError('Password must be at least 8 characters');
+                      } else {
+                        setError('');
+                      }
+                    }}
                     className={inputStyle}
                     required
                   />
@@ -197,7 +259,11 @@ const Login = () => {
                     Forgot Password?
                   </button>
                 </div>
-                <button type="submit" className={buttonStyle}>
+                <button 
+                  type="submit" 
+                  data-testid="desktop-submit"
+                  className={buttonStyle}
+                >
                   Sign in
                 </button>
               </form>
@@ -213,6 +279,7 @@ const Login = () => {
           <div className="flex mb-6 border-b">
           <button
             onClick={() => setIsLoginView(false)}
+            data-testid="mobile-login-tab"
             className={`flex-1 py-3 px-4 text-center ${
               !isLoginView 
                 ? isDarkMode 
@@ -225,6 +292,7 @@ const Login = () => {
           </button>
           <button
             onClick={() => setIsLoginView(true)}
+            data-testid="mobile-register-tab"
             className={`flex-1 py-3 px-4 text-center ${
               isLoginView 
                 ? isDarkMode 
@@ -237,10 +305,13 @@ const Login = () => {
           </button>
           </div>
 
-          {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+          {error && <p className="text-red-500 mb-4 text-sm" data-testid="mobile-error-message">{error}</p>}
 
           {!isLoginView ? (
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form 
+              className="space-y-4"
+              data-testid="login-form-mobile"
+              onSubmit={handleSubmit}>
               <div>
                 <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Email Address</label>
                 <input
@@ -270,7 +341,11 @@ const Login = () => {
                   Forgot Password?
                 </button>
               </div>
-              <button type="submit" className={buttonStyle}>
+              <button 
+                type="submit" 
+                data-testid="mobile-submit"
+                className={buttonStyle}
+              >
                 Sign in
               </button>
               <div className="mt-4 text-sm text-center">
@@ -285,6 +360,7 @@ const Login = () => {
                 <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Account Number</label>
                 <input
                   type="text"
+                  aria-label="Account Number"
                   value={regAccount}
                   onChange={(e) => setRegAccount(e.target.value)}
                   className={inputStyle}
@@ -295,6 +371,7 @@ const Login = () => {
                 <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Owner ID</label>
                 <input
                   type="text"
+                  aria-label="Owner ID"
                   value={regOwner}
                   onChange={(e) => setRegOwner(e.target.value)}
                   className={inputStyle}
@@ -305,6 +382,7 @@ const Login = () => {
                 <label className={`${isDarkMode ? 'text-tanish-dark' : 'text-darkblue-light'} block text-sm font-medium mb-1`}>Temporary Code</label>
                 <input
                   type="password"
+                  aria-label="Temporary Code"
                   value={regCode}
                   onChange={(e) => setRegCode(e.target.value)}
                   className={inputStyle}
@@ -325,10 +403,7 @@ const Login = () => {
           accountId={regAccount}
           ownerId={regOwner}
           onClose={() => setShowRegistrationModal(false)}
-          onSuccess={() => {
-            setShowRegistrationModal(false);
-            setIsLoginView(true);
-          }}
+          onSuccess={handleRegistrationSuccess}
         />
       )}
       {showChangePasswordModal && (
